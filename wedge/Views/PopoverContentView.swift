@@ -15,6 +15,7 @@ struct PopoverContentView: View {
 
     @State private var draft = ""
     @State private var selection: UUID?
+    @State private var donePulse = false
 
     private var addPlaceholder: String {
         store.items.isEmpty ? "What's your one thing?" : "Add to up next…"
@@ -28,6 +29,13 @@ struct PopoverContentView: View {
         }
         .padding(12)
         .frame(width: 280)
+        .opacity(donePulse ? 0.85 : 1)
+        .onReceive(NotificationCenter.default.publisher(for: .wedgeDidPop)) { _ in
+            withAnimation(.easeOut(duration: 0.15)) { donePulse = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                withAnimation(.easeIn(duration: 0.15)) { donePulse = false }
+            }
+        }
     }
 
     private var header: some View {

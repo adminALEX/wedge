@@ -1,16 +1,28 @@
 import AppKit
 import SwiftUI
 
+extension Notification.Name {
+    static let wedgeDidPop = Notification.Name("wedgeDidPop")
+}
+
 @MainActor
 final class StatusItemController: NSObject {
     private let store: WedgeStore
     private let persistence: any WedgePersisting
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
+    private let popSound = PopSoundPlayer()
+    private var pressureMonitor: Any?
 
     init(store: WedgeStore, persistence: any WedgePersisting) {
         self.store = store
         self.persistence = persistence
+    }
+
+    deinit {
+        if let pressureMonitor {
+            NSEvent.removeMonitor(pressureMonitor)
+        }
     }
 
     func start() {
@@ -26,6 +38,19 @@ final class StatusItemController: NSObject {
         }
         statusItem = item
         refreshTitle()
+
+        // Force click (trackpad, stage 2) → Done. Best-effort: falls through to
+        // the normal click path on mouse-only hardware or when stage/pressure
+        // thresholds aren't met, so ⌥-click and menu Done remain the required paths.
+        pressureMonitor = NSEvent.addLocalMonitorForEvents(matching: [.pressure]) { [weak self] event in
+            guard let self,
+                  let button = self.statusItem?.button,
+                  event.window == button.window,
+                  event.stage == 2,
+                  event.pressure > 0.5 else { return event }
+            self.performDone()
+            return nil
+        }
     }
 
     func refreshTitle() {
@@ -46,6 +71,10 @@ final class StatusItemController: NSObject {
         guard let event = NSApp.currentEvent else { return }
         if event.type == .rightMouseUp {
             showContextMenu()
+            return
+        }
+        if event.modifierFlags.contains(.option) {
+            performDone()
             return
         }
         togglePopover()
@@ -70,8 +99,9 @@ final class StatusItemController: NSObject {
 
     func performDone() {
         guard store.completeOneThing() != nil else { return }
-        // Sound + animation wired in Task 6
+        popSound.play()
         persistAndRefresh()
+        NotificationCenter.default.post(name: .wedgeDidPop, object: nil)
     }
 
     private func togglePopover() {
