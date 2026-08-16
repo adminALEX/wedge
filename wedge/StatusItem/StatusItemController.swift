@@ -80,9 +80,15 @@ final class StatusItemController: NSObject {
             pop.behavior = .transient
             pop.contentSize = NSSize(width: 280, height: 320)
             pop.contentViewController = NSHostingController(
-                rootView: PopoverContentView(store: store, onChange: { [weak self] in
-                    self?.persistAndRefresh()
-                })
+                rootView: PopoverContentView(
+                    store: store,
+                    onChange: { [weak self] in
+                        self?.persistAndRefresh()
+                    },
+                    onDone: { [weak self] in
+                        self?.performDone()
+                    }
+                )
             )
             self.popover = pop
         }
