@@ -13,6 +13,11 @@ final class StatusItemController: NSObject {
     private var popover: NSPopover?
     private let popSound = PopSoundPlayer()
     private var pressureMonitor: Any?
+    private var lastPressureDoneAt: Date?
+
+    /// A force click also delivers a trailing `leftMouseUp`, which would open
+    /// the popover right after the pressure gesture already ran Done.
+    private static let pressureSuppressionWindow: TimeInterval = 0.5
 
     init(store: WedgeStore, persistence: any WedgePersisting) {
         self.store = store
@@ -48,6 +53,7 @@ final class StatusItemController: NSObject {
                   event.window == button.window,
                   event.stage == 2,
                   event.pressure > 0.5 else { return event }
+            self.lastPressureDoneAt = Date()
             self.performDone()
             return nil
         }
@@ -77,11 +83,18 @@ final class StatusItemController: NSObject {
             performDone()
             return
         }
+        guard !isWithinPressureSuppressionWindow else { return }
         togglePopover()
+    }
+
+    private var isWithinPressureSuppressionWindow: Bool {
+        guard let lastPressureDoneAt else { return false }
+        return Date().timeIntervalSince(lastPressureDoneAt) < Self.pressureSuppressionWindow
     }
 
     private func showContextMenu() {
         let menu = NSMenu()
+        menu.autoenablesItems = false
         let doneItem = NSMenuItem(title: "Done", action: #selector(menuDone(_:)), keyEquivalent: "")
         doneItem.target = self
         doneItem.isEnabled = store.oneThing != nil
