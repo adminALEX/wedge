@@ -28,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        LaunchAtLoginService.enableOnLaunch()
         if let items = try? persistence.load() {
             store.replaceAll(items)
         }
