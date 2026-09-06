@@ -3,6 +3,7 @@ import SwiftUI
 
 extension Notification.Name {
     static let wedgeDidPop = Notification.Name("wedgeDidPop")
+    static let wedgePanelDidOpen = Notification.Name("wedgePanelDidOpen")
 }
 
 @MainActor
@@ -10,61 +11,98 @@ final class StatusItemController: NSObject {
     private let store: WedgeStore
     private let persistence: any WedgePersisting
     private var statusItem: NSStatusItem?
-    private var popover: NSPopover?
+    /// Floating panel (not a transient popover) so text editing stays usable.
+    private var panel: NSPanel?
     private let popSound = PopSoundPlayer()
-    private var pressureMonitor: Any?
-    private var lastPressureDoneAt: Date?
+    /// After ⌥-click Done on mouseDown, ignore the matching mouseUp so the panel doesn't open.
+    private var suppressNextLeftMouseUp = false
 
-    /// A force click also delivers a trailing `leftMouseUp`, which would open
-    /// the popover right after the pressure gesture already ran Done.
-    private static let pressureSuppressionWindow: TimeInterval = 0.5
+    private static let panelSize = NSSize(width: 300, height: 340)
 
     init(store: WedgeStore, persistence: any WedgePersisting) {
         self.store = store
         self.persistence = persistence
     }
 
-    deinit {
-        if let pressureMonitor {
-            NSEvent.removeMonitor(pressureMonitor)
-        }
-    }
-
     func start() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = item.button {
-            let image = NSImage(systemSymbolName: "circle.fill", accessibilityDescription: "Wedge")
-            image?.isTemplate = true
-            button.image = image
-            button.imagePosition = .imageLeft
+            // Prefer mouseDown so ⌥ is accurate for menu-bar items.
             button.target = self
             button.action = #selector(statusItemPrimaryAction(_:))
-            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+            button.sendAction(on: [.leftMouseDown, .leftMouseUp, .rightMouseDown])
         }
         statusItem = item
         refreshTitle()
-
-        // Force click (trackpad, stage 2) → Done. Best-effort: falls through to
-        // the normal click path on mouse-only hardware or when stage/pressure
-        // thresholds aren't met, so ⌥-click and menu Done remain the required paths.
-        pressureMonitor = NSEvent.addLocalMonitorForEvents(matching: [.pressure]) { [weak self] event in
-            guard let self,
-                  let button = self.statusItem?.button,
-                  event.window == button.window,
-                  event.stage == 2,
-                  event.pressure > 0.5 else { return event }
-            self.lastPressureDoneAt = Date()
-            self.performDone()
-            return nil
+        NotificationCenter.default.addObserver(
+            forName: .wedgeMenuBarAppearanceDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshTitle()
+            }
         }
+        // After Settings (or panel) closes, return to menu-bar-only if nothing is open.
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.restoreAccessoryPolicyIfIdle()
+            }
+        }
+    }
+
+    /// Accessory apps don't own the menu bar, so native ⌘, never fires.
+    /// While a Wedge window is open, briefly behave like a normal app so the
+    /// system Settings… item (⌘,) works — no custom Settings opener.
+    private func presentAsNormalAppWhileWindowsOpen() {
+        if NSApp.activationPolicy() != .regular {
+            NSApp.setActivationPolicy(.regular)
+        }
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func restoreAccessoryPolicyIfIdle() {
+        let hasVisibleAppWindow = NSApp.windows.contains { window in
+            guard window.isVisible else { return false }
+            if window === statusItem?.button?.window { return false }
+            // Status-item / menu chrome.
+            if String(describing: type(of: window)).contains("NSStatusBar") { return false }
+            return true
+        }
+        if !hasVisibleAppWindow, NSApp.activationPolicy() != .accessory {
+            NSApp.setActivationPolicy(.accessory)
+        }
+    }
+
+    private var optionKeyDown: Bool {
+        NSEvent.modifierFlags
+            .intersection(.deviceIndependentFlagsMask)
+            .contains(.option)
     }
 
     func refreshTitle() {
         guard let button = statusItem?.button else { return }
         if let text = store.oneThing?.text {
-            button.title = text
-        } else {
+            button.image = nil
             button.title = ""
+            button.attributedTitle = NSAttributedString(
+                string: text,
+                attributes: [
+                    .foregroundColor: MenuBarAppearance.titleColor,
+                    .font: MenuBarAppearance.titleFont
+                ]
+            )
+        } else {
+            button.attributedTitle = NSAttributedString(string: "")
+            button.title = ""
+            let image = NSImage(systemSymbolName: "circle.fill", accessibilityDescription: "Wedge")
+            image?.isTemplate = true
+            button.image = image
+            button.imagePosition = .imageOnly
         }
     }
 
@@ -75,21 +113,28 @@ final class StatusItemController: NSObject {
 
     @objc private func statusItemPrimaryAction(_ sender: NSStatusBarButton) {
         guard let event = NSApp.currentEvent else { return }
-        if event.type == .rightMouseUp {
-            showContextMenu()
-            return
-        }
-        if event.modifierFlags.contains(.option) {
-            performDone()
-            return
-        }
-        guard !isWithinPressureSuppressionWindow else { return }
-        togglePopover()
-    }
 
-    private var isWithinPressureSuppressionWindow: Bool {
-        guard let lastPressureDoneAt else { return false }
-        return Date().timeIntervalSince(lastPressureDoneAt) < Self.pressureSuppressionWindow
+        switch event.type {
+        case .rightMouseDown:
+            showContextMenu()
+
+        case .leftMouseDown:
+            // ⌥ + click → Done (power-user fast clear).
+            if optionKeyDown {
+                suppressNextLeftMouseUp = true
+                performDone()
+            }
+
+        case .leftMouseUp:
+            if suppressNextLeftMouseUp {
+                suppressNextLeftMouseUp = false
+                return
+            }
+            togglePanel()
+
+        default:
+            break
+        }
     }
 
     private func showContextMenu() {
@@ -99,6 +144,14 @@ final class StatusItemController: NSObject {
         doneItem.target = self
         doneItem.isEnabled = store.oneThing != nil
         menu.addItem(doneItem)
+        menu.addItem(.separator())
+        let settingsItem = NSMenuItem(
+            title: "Settings…",
+            action: #selector(menuOpenSettings(_:)),
+            keyEquivalent: ","
+        )
+        settingsItem.target = self
+        menu.addItem(settingsItem)
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Wedge", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem?.menu = menu
@@ -110,6 +163,15 @@ final class StatusItemController: NSObject {
         performDone()
     }
 
+    @objc private func menuOpenSettings(_ sender: Any?) {
+        // Own the menu bar so the Settings scene can present, then invoke the
+        // same action the system Settings… menu item uses.
+        presentAsNormalAppWhileWindowsOpen()
+        DispatchQueue.main.async {
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
+    }
+
     func performDone() {
         guard store.completeOneThing() != nil else { return }
         popSound.play()
@@ -117,30 +179,68 @@ final class StatusItemController: NSObject {
         NotificationCenter.default.post(name: .wedgeDidPop, object: nil)
     }
 
-    private func togglePopover() {
-        if popover == nil {
-            let pop = NSPopover()
-            pop.behavior = .transient
-            pop.contentSize = NSSize(width: 280, height: 320)
-            pop.contentViewController = NSHostingController(
-                rootView: PopoverContentView(
-                    store: store,
-                    onChange: { [weak self] in
-                        self?.persistAndRefresh()
-                    },
-                    onDone: { [weak self] in
-                        self?.performDone()
-                    }
-                )
-            )
-            self.popover = pop
+    private func togglePanel() {
+        if panel == nil {
+            panel = makePanel()
         }
-        guard let button = statusItem?.button, let popover else { return }
-        if popover.isShown {
-            popover.performClose(nil)
+        guard let panel else { return }
+        if panel.isVisible {
+            panel.orderOut(nil)
+            restoreAccessoryPolicyIfIdle()
         } else {
             refreshTitle()
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            centerPanelOnScreen(panel)
+            // Own the menu bar so system Settings… (⌘,) is live — not a custom opener.
+            presentAsNormalAppWhileWindowsOpen()
+            // orderFrontRegardless: accessory apps can otherwise fail to raise
+            // the panel on the active Space / secondary display.
+            panel.orderFrontRegardless()
+            panel.makeKeyAndOrderFront(nil)
+            NotificationCenter.default.post(name: .wedgePanelDidOpen, object: nil)
         }
+    }
+
+    private func makePanel() -> NSPanel {
+        let hosting = NSHostingController(
+            rootView: PopoverContentView(
+                store: store,
+                onChange: { [weak self] in
+                    self?.persistAndRefresh()
+                },
+                onDone: { [weak self] in
+                    self?.performDone()
+                }
+            )
+        )
+        hosting.view.frame.size = Self.panelSize
+
+        let panel = NSPanel(
+            contentRect: NSRect(origin: .zero, size: Self.panelSize),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = "Wedge"
+        panel.isFloatingPanel = true
+        panel.level = .floating
+        panel.hidesOnDeactivate = false
+        panel.isReleasedWhenClosed = false
+        panel.isMovableByWindowBackground = true
+        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        panel.contentViewController = hosting
+        return panel
+    }
+
+    private func centerPanelOnScreen(_ panel: NSPanel) {
+        let screen = statusItem?.button?.window?.screen
+            ?? NSScreen.screens.first(where: { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) })
+            ?? NSScreen.main
+        guard let visible = screen?.visibleFrame else { return }
+        let size = panel.frame.size
+        let origin = NSPoint(
+            x: visible.midX - size.width / 2,
+            y: visible.midY - size.height / 2
+        )
+        panel.setFrame(NSRect(origin: origin, size: size), display: true)
     }
 }

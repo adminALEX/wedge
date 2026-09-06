@@ -1,0 +1,22 @@
+---
+description: Before acting, search the skills ecosystem with find-skills for request-relevant skills
+alwaysApply: true
+---
+
+# Find relevant skills for the request
+
+For each user request, **before implementing or answering from habit alone**, use the **find-skills** skill (`/find-skills`) to search for skills that match the current task.
+
+## Do this
+
+1. Identify the domain and task (e.g. SwiftUI list, XCTest, menu bar, roadmap update).
+2. Run find-skills / `npx skills find` with specific keywords for that request.
+3. Prefer reputable, high-install skills; skip low-quality or off-scope results.
+4. If a useful skill is found and not installed, **tell the user** and offer to install it (or install when they ask).
+5. If an installed project skill already covers the need (see `.cursor/skills/` / `.agents/skills/`), **use that skill** instead of reinventing the workflow.
+
+## Do not
+
+- Skip the search on non-trivial work (“I already know how”).
+- Install random low-install skills without user agreement.
+- Let find-skills block tiny clarifications (yes/no, one-word answers) — search when the request implies real work (build, design, test, docs, plan, debug).

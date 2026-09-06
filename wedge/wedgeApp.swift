@@ -13,9 +13,9 @@ struct wedgeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        // No windows — menu bar only. Settings scene reserved for v3.
+        // Native Settings scene — system installs Settings… with ⌘, in the app menu.
         Settings {
-            EmptyView()
+            WedgeSettingsView()
         }
     }
 }

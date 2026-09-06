@@ -1,0 +1,15 @@
+---
+description: macOS menu-bar app conventions for Wedge Swift code
+globs: "**/*.swift"
+alwaysApply: false
+---
+
+# macOS menu bar
+
+- Ship as **accessory / LSUIElement** — no Dock, no Cmd-Tab app window for v1.
+- Status item: left click = floating panel (toggle); right click = native menu (Done, Settings…, Quit); ⌥+click = Done when a one thing exists.
+- Prefer SwiftUI for panel content; use AppKit for NSStatusItem, NSPanel, sound, etc. Do not use a transient `NSPopover` for the main UI (text editing breaks).
+- Keep the panel small and power-user oriented — minimal chrome. Settings via native **⌘,** / **Settings…** (SwiftUI `Settings` scene; status-item menu uses the system Settings action).
+- Panel window title is **Wedge** (system title bar); no in-content app title or Done button — Done is ⌘↩ / status-item shortcuts.
+- List rows show an always-visible Notion-style **6-dot grip**; reorder via `List`/`onMove`.
+- While panel/Settings is open, switch to `.regular` so the app menu exists; return to `.accessory` when idle.

@@ -1,0 +1,35 @@
+---
+description: Keep plans, docs, and rules aligned when product or scope changes
+alwaysApply: true
+---
+
+# Plans / docs / rules alignment
+
+## Canonical product docs
+
+| Doc | Path |
+|-----|------|
+| Overview | `docs/product/overview.md` |
+| Roadmap | `docs/product/roadmap.md` |
+| Phases | `docs/product/phases/v1.md`, `v2.md`, `v3.md` |
+| Agent product rule | `.cursor/rules/wedge-product.mdc` |
+
+## Skill map
+
+| Need | Skill |
+|------|--------|
+| Product phases / roadmap | `roadmap-update` |
+| Implementation plan (bite-sized + tests) | `writing-plans` |
+| Sync docs after landed changes | `docs-updater` |
+| Full align after confirmation | `wedge-keep-aligned` |
+
+## When the user confirms a product or scope change
+
+1. Update the matching `docs/product/` file(s).
+2. Update `.cursor/rules/wedge-product.mdc` if v1 behavior/language/horizon changed.
+3. Do not leave rules contradicting docs.
+
+## Do not
+
+- Add v4, cloud/sync, or Dock-mode features to docs without explicit user confirmation.
+- Invent truncation/higher char limits into a phase until discussed (v1 stays at 40, no truncation).
