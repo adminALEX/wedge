@@ -1,7 +1,8 @@
 import SwiftUI
 import AppKit
+import KeyboardShortcuts
 
-/// Very small settings surface — menu-bar title color + bold.
+/// Menu-bar appearance + remappable global keyboard shortcuts.
 struct WedgeSettingsView: View {
     @State private var isBold = MenuBarAppearance.isBold
     @State private var usesAutomaticColor = MenuBarAppearance.usesAutomaticColor
@@ -21,9 +22,22 @@ struct WedgeSettingsView: View {
                 Text("Applies to the one thing in the menu bar. Automatic follows the system label color.")
                     .foregroundStyle(.secondary)
             }
+
+            Section {
+                KeyboardShortcuts.Recorder("Toggle panel", name: .togglePanel)
+                KeyboardShortcuts.Recorder("Done", name: .markDone)
+                Button("Reset to defaults") {
+                    KeyboardShortcuts.reset(.togglePanel, .markDone)
+                }
+            } header: {
+                Text("Keyboard shortcuts")
+            } footer: {
+                Text("Defaults are ⌃⌥W (toggle panel) and ⌃⌥D (Done). Prefer chords that include Control or Command — Option/Shift-only remaps can fail on some macOS 15 versions. Remapping saves automatically.")
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 320, height: usesAutomaticColor ? 160 : 200)
+        .frame(width: 360, height: usesAutomaticColor ? 280 : 320)
         .onChange(of: isBold) { _, newValue in
             MenuBarAppearance.isBold = newValue
         }
