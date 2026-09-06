@@ -48,7 +48,7 @@ struct WedgeSettingsView: View {
             } header: {
                 Text("Sound")
             } footer: {
-                Text("Played when you mark Done. Choose a short AIFF, WAV, MP3, M4A, or CAF file.")
+                Text("Played when you mark Done. Custom files must be 3 seconds or shorter (AIFF, WAV, MP3, M4A, or CAF).")
                     .foregroundStyle(.secondary)
             }
 

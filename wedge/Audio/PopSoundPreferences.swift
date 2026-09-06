@@ -1,16 +1,21 @@
+import AVFoundation
 import Foundation
 
 extension Notification.Name {
     static let wedgePopSoundPreferencesDidChange = Notification.Name("wedgePopSoundPreferencesDidChange")
 }
 
-enum PopSoundPreferencesError: Error {
+enum PopSoundPreferencesError: Error, Equatable {
     case unsupportedType
+    case unreadable
+    case tooLong
 }
 
 enum PopSoundPreferences {
     static let enabledKey = "wedge.popSoundEnabled"
     static let customFileNameKey = "wedge.popSoundCustomFileName"
+    /// Max length for a user-chosen Done sound (seconds).
+    static let maxCustomDurationSeconds: TimeInterval = 3
 
     static func isEnabled(defaults: UserDefaults = .standard) -> Bool {
         if defaults.object(forKey: enabledKey) == nil { return true }
@@ -43,6 +48,7 @@ enum PopSoundPreferences {
     }
 
     /// Copies `source` into Application Support as `custom-pop.<ext>`.
+    /// Rejects non-audio types and files longer than `maxCustomDurationSeconds`.
     static func installCustomSound(
         from source: URL,
         defaults: UserDefaults = .standard,
@@ -53,6 +59,7 @@ enum PopSoundPreferences {
         guard allowed.contains(ext) else {
             throw PopSoundPreferencesError.unsupportedType
         }
+        try validateDuration(of: source)
         try FileManager.default.createDirectory(at: supportRoot, withIntermediateDirectories: true)
         // ponytail: single slot — replace any previous custom file
         if let existing = try? FileManager.default.contentsOfDirectory(
@@ -86,5 +93,17 @@ enum PopSoundPreferences {
 
     static func notify() {
         NotificationCenter.default.post(name: .wedgePopSoundPreferencesDidChange, object: nil)
+    }
+
+    /// Reject long clips before copying into the sandbox container.
+    static func validateDuration(of url: URL) throws {
+        let asset = AVURLAsset(url: url)
+        let seconds = CMTimeGetSeconds(asset.duration)
+        guard seconds.isFinite, seconds > 0 else {
+            throw PopSoundPreferencesError.unreadable
+        }
+        guard seconds <= maxCustomDurationSeconds else {
+            throw PopSoundPreferencesError.tooLong
+        }
     }
 }
