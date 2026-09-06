@@ -10,6 +10,9 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 
+# Local export / packaging (do not push)
+dist/
+
 # macOS
 .DS_Store
 
