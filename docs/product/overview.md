@@ -25,8 +25,8 @@ Wedge is intentionally small. The product is planned only through **v3**:
 
 | Phase | Role |
 |-------|------|
-| [v1](phases/v1.md) | Core loop, usable daily |
-| [v2](phases/v2.md) | Speed (global hotkeys, denser keyboard) |
+| [v1](phases/v1.md) | Shipped — core loop, usable daily |
+| [v2](phases/v2.md) | Next — speed (global hotkeys, denser keyboard) |
 | [v3](phases/v3.md) | Expand Settings (sound, login, hotkey remap) |
 
 See [roadmap.md](roadmap.md) for the index.
