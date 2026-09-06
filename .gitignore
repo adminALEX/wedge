@@ -18,3 +18,6 @@ dist/
 
 # SwiftPM (if added later)
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# Git worktrees
+.worktrees/
