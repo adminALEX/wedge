@@ -13,6 +13,21 @@ enum LaunchAtLoginService {
     /// UserDefaults flag recording that we already asked for the login item once.
     static let didRequestKey = "wedge.didRequestLoginItem"
 
+    static var isEnabled: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    static func setEnabled(_ enabled: Bool) throws {
+        let service = SMAppService.mainApp
+        if enabled {
+            guard service.status != .enabled else { return }
+            try service.register()
+        } else {
+            guard service.status != .notRegistered else { return }
+            try service.unregister()
+        }
+    }
+
     /// Registers the login item exactly once, on the first launch that ever
     /// asks. Re-registering on every launch would silently undo the user
     /// turning Wedge off in System Settings > General > Login Items.
