@@ -80,8 +80,7 @@ struct PopoverContentView: View {
                 onChange()
             }
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
+        .listStyle(.inset)
         .frame(maxHeight: .infinity)
         .onDeleteCommand { deleteSelectedItem() }
     }
