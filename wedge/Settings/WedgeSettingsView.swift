@@ -3,7 +3,7 @@ import AppKit
 import KeyboardShortcuts
 import UniformTypeIdentifiers
 
-/// Menu-bar appearance + remappable global keyboard shortcuts.
+/// Menu-bar appearance, sound, login, and remappable global keyboard shortcuts.
 struct WedgeSettingsView: View {
     @State private var isBold = MenuBarAppearance.isBold
     @State private var usesAutomaticColor = MenuBarAppearance.usesAutomaticColor
@@ -18,59 +18,59 @@ struct WedgeSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Bold", isOn: $isBold)
-                Toggle("Automatic color", isOn: $usesAutomaticColor)
+                Toggle(WedgeCopy.bold, isOn: $isBold)
+                Toggle(WedgeCopy.automaticColor, isOn: $usesAutomaticColor)
                 if !usesAutomaticColor {
-                    ColorPicker("Color", selection: $customColor, supportsOpacity: false)
+                    ColorPicker(WedgeCopy.color, selection: $customColor, supportsOpacity: false)
                 }
             } footer: {
-                Text("Applies to the one thing in the menu bar. Automatic follows the system label color.")
+                Text(WedgeCopy.appearanceFooter)
                     .foregroundStyle(.secondary)
             }
 
             Section {
-                Toggle("Play sound", isOn: $soundEnabled)
+                Toggle(WedgeCopy.playSound, isOn: $soundEnabled)
                 HStack {
-                    Text(customName.map { "Custom: \($0)" } ?? "Default pop sound")
+                    Text(customName.map(WedgeCopy.customPopSoundLabel) ?? WedgeCopy.defaultPopSound)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                     Spacer()
-                    Button("Preview") { previewPlayer.play() }
+                    Button(WedgeCopy.preview) { previewPlayer.play() }
                         .disabled(!soundEnabled)
-                    Button("Choose…") { chooseCustomSound() }
+                    Button(WedgeCopy.chooseEllipsis) { chooseCustomSound() }
                     if customName != nil {
-                        Button("Use default") {
+                        Button(WedgeCopy.useDefault) {
                             PopSoundPreferences.clearCustomSound()
                             customName = nil
                         }
                     }
                 }
             } header: {
-                Text("Sound")
+                Text(WedgeCopy.soundSection)
             } footer: {
-                Text("Played when you mark Done. Custom files must be 3 seconds or shorter (AIFF, WAV, MP3, M4A, or CAF).")
+                Text(WedgeCopy.soundFooter)
                     .foregroundStyle(.secondary)
             }
 
             Section {
-                Toggle("Launch at login", isOn: $launchAtLogin)
+                Toggle(WedgeCopy.launchAtLogin, isOn: $launchAtLogin)
             } header: {
-                Text("General")
+                Text(WedgeCopy.generalSection)
             } footer: {
-                Text("Starts Wedge automatically when you log in to your Mac.")
+                Text(WedgeCopy.launchAtLoginFooter)
                     .foregroundStyle(.secondary)
             }
 
             Section {
-                KeyboardShortcuts.Recorder("Toggle panel", name: .togglePanel)
-                KeyboardShortcuts.Recorder("Done", name: .markDone)
-                Button("Reset to defaults") {
+                KeyboardShortcuts.Recorder(WedgeCopy.togglePanelShortcut, name: .togglePanel)
+                KeyboardShortcuts.Recorder(WedgeCopy.doneShortcut, name: .markDone)
+                Button(WedgeCopy.resetToDefaults) {
                     KeyboardShortcuts.reset(.togglePanel, .markDone)
                 }
             } header: {
-                Text("Keyboard shortcuts")
+                Text(WedgeCopy.keyboardShortcutsSection)
             } footer: {
-                Text("Defaults are ⌃⌥W (toggle panel) and ⌃⌥D (Done). Prefer chords that include Control or Command — Option/Shift-only remaps can fail on some macOS 15 versions. Remapping saves automatically.")
+                Text(WedgeCopy.keyboardShortcutsFooter)
                     .foregroundStyle(.secondary)
             }
         }

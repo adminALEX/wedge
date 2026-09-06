@@ -35,7 +35,7 @@ enum PopSoundPreferences {
 
     static func defaultSupportRoot() -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return base.appendingPathComponent("Wedge", isDirectory: true)
+        return base.appendingPathComponent(WedgeCopy.appName, isDirectory: true)
     }
 
     static func customSoundURL(

@@ -24,7 +24,7 @@ struct PopoverContentView: View {
     @FocusState private var focus: PanelFocus?
 
     private var addPlaceholder: String {
-        store.items.isEmpty ? "What's your one thing?" : "Add to up next…"
+        store.items.isEmpty ? WedgeCopy.addOneThingPlaceholder : WedgeCopy.addUpNextPlaceholder
     }
 
     var body: some View {
@@ -38,7 +38,7 @@ struct PopoverContentView: View {
         .frame(width: 300)
         .opacity(donePulse ? 0.85 : 1)
         .background {
-            Button("Done") { onDone() }
+            Button(WedgeCopy.done) { onDone() }
                 .keyboardShortcut(.return, modifiers: .command)
                 .opacity(0)
                 .allowsHitTesting(false)
@@ -119,7 +119,7 @@ struct PopoverContentView: View {
         }
         .padding(.vertical, 2)
         .contextMenu {
-            Button("Delete") {
+            Button(WedgeCopy.delete) {
                 store.delete(id: item.id)
                 if editingItemID == item.id { editingItemID = nil }
                 if selection == item.id { selection = nil }
@@ -185,7 +185,7 @@ private struct NotionDragHandle: View {
         }
         .foregroundStyle(.secondary.opacity(0.7))
         .frame(width: 14, height: 22, alignment: .center)
-        .accessibilityLabel("Drag to reorder")
+        .accessibilityLabel(WedgeCopy.dragToReorder)
     }
 }
 
@@ -224,7 +224,7 @@ private struct ItemRow: View {
     var body: some View {
         Group {
             if isEditing {
-                TextField("Item", text: $text)
+                TextField(WedgeCopy.itemFieldAccessibility, text: $text)
                     .textFieldStyle(.plain)
                     .font(rowFont)
                     .focused(focus, equals: .item(item.id))

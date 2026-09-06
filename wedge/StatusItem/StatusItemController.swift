@@ -112,7 +112,10 @@ final class StatusItemController: NSObject {
         } else {
             button.attributedTitle = NSAttributedString(string: "")
             button.title = ""
-            let image = NSImage(systemSymbolName: "circle.fill", accessibilityDescription: "Wedge")
+            let image = NSImage(
+                systemSymbolName: "circle.fill",
+                accessibilityDescription: WedgeCopy.statusItemAccessibility
+            )
             image?.isTemplate = true
             button.image = image
             button.imagePosition = .imageOnly
@@ -152,21 +155,34 @@ final class StatusItemController: NSObject {
 
     private func showContextMenu() {
         let menu = NSMenu()
+        menu.delegate = self
         menu.autoenablesItems = false
-        let doneItem = NSMenuItem(title: "Done", action: #selector(menuDone(_:)), keyEquivalent: "")
+        let doneItem = NSMenuItem(
+            title: WedgeCopy.done,
+            action: #selector(menuDone(_:)),
+            keyEquivalent: ""
+        )
         doneItem.target = self
         doneItem.isEnabled = store.oneThing != nil
+        // Show the remappable global Done chord beside the menu title.
+        doneItem.setShortcut(for: .markDone)
         menu.addItem(doneItem)
         menu.addItem(.separator())
         let settingsItem = NSMenuItem(
-            title: "Settings…",
+            title: WedgeCopy.settingsMenu,
             action: #selector(menuOpenSettings(_:)),
             keyEquivalent: ","
         )
         settingsItem.target = self
         menu.addItem(settingsItem)
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quit Wedge", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(
+            NSMenuItem(
+                title: WedgeCopy.quitMenu,
+                action: #selector(NSApplication.terminate(_:)),
+                keyEquivalent: "q"
+            )
+        )
         statusItem?.menu = menu
         statusItem?.button?.performClick(nil)
         statusItem?.menu = nil
@@ -233,7 +249,7 @@ final class StatusItemController: NSObject {
             backing: .buffered,
             defer: false
         )
-        panel.title = "Wedge"
+        panel.title = WedgeCopy.appName
         panel.isFloatingPanel = true
         panel.level = .floating
         panel.hidesOnDeactivate = false
@@ -255,5 +271,17 @@ final class StatusItemController: NSObject {
             y: visible.midY - size.height / 2
         )
         panel.setFrame(NSRect(origin: origin, size: size), display: true)
+    }
+}
+
+extension StatusItemController: NSMenuDelegate {
+    // KeyboardShortcuts: while NSMenu is open, disable globals so key events
+    // aren't buffered and fired when the menu closes.
+    func menuWillOpen(_ menu: NSMenu) {
+        KeyboardShortcuts.disable(.togglePanel, .markDone)
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        KeyboardShortcuts.enable(.togglePanel, .markDone)
     }
 }
