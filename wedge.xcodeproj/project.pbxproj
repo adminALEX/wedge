@@ -3,8 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 110;
+	objectVersion = 77;
 	objects = {
+
+/* Begin PBXBuildFile section */
+		FA7FFDAE304E03D800EF9F21 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = CA016BE5F6DEC09495513B87 /* KeyboardShortcuts */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		FA6157843031B5F600315631 /* PBXContainerItemProxy */ = {
@@ -32,22 +36,16 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FA6157783031B5F400315631 /* wedge */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = wedge;
 			sourceTree = "<group>";
 		};
 		FA6157863031B5F600315631 /* wedgeTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = wedgeTests;
 			sourceTree = "<group>";
 		};
 		FA6157903031B5F600315631 /* wedgeUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = wedgeUITests;
 			sourceTree = "<group>";
 		};
@@ -56,18 +54,25 @@
 /* Begin PBXFrameworksBuildPhase section */
 		FA6157733031B5F400315631 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
+				FA7FFDAE304E03D800EF9F21 /* KeyboardShortcuts in Frameworks */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA6157803031B5F600315631 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA61578A3031B5F600315631 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -135,6 +140,8 @@
 				FA6157863031B5F600315631 /* wedgeTests */,
 			);
 			name = wedgeTests;
+			packageProductDependencies = (
+			);
 			productName = wedgeTests;
 			productReference = FA6157833031B5F600315631 /* wedgeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -156,6 +163,8 @@
 				FA6157903031B5F600315631 /* wedgeUITests */,
 			);
 			name = wedgeUITests;
+			packageProductDependencies = (
+			);
 			productName = wedgeUITests;
 			productReference = FA61578D3031B5F600315631 /* wedgeUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -210,36 +219,48 @@
 /* Begin PBXResourcesBuildPhase section */
 		FA6157743031B5F400315631 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA6157813031B5F600315631 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA61578B3031B5F600315631 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FA6157723031B5F400315631 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA61577F3031B5F600315631 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA6157893031B5F600315631 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -526,6 +547,7 @@
 				FA6157933031B5F600315631 /* Debug */,
 				FA6157943031B5F600315631 /* Release */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		FA6157953031B5F600315631 /* Build configuration list for PBXNativeTarget "wedge" */ = {
@@ -534,6 +556,7 @@
 				FA6157963031B5F600315631 /* Debug */,
 				FA6157973031B5F600315631 /* Release */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		FA6157983031B5F600315631 /* Build configuration list for PBXNativeTarget "wedgeTests" */ = {
@@ -542,6 +565,7 @@
 				FA6157993031B5F600315631 /* Debug */,
 				FA61579A3031B5F600315631 /* Release */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		FA61579B3031B5F600315631 /* Build configuration list for PBXNativeTarget "wedgeUITests" */ = {
@@ -550,6 +574,7 @@
 				FA61579C3031B5F600315631 /* Debug */,
 				FA61579D3031B5F600315631 /* Release */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */

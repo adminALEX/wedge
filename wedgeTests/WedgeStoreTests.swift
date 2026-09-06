@@ -29,6 +29,20 @@ struct WedgeStoreTests {
         #expect(throws: WedgeStoreError.emptyText) {
             try store.add("   ")
         }
+        #expect(throws: WedgeStoreError.emptyText) {
+            try store.add("")
+        }
+        #expect(throws: WedgeStoreError.emptyText) {
+            try store.add("\n\t")
+        }
+    }
+
+    @Test("add trims surrounding whitespace")
+    func addTrimsWhitespace() throws {
+        let store = WedgeStore()
+        let item = try store.add("  Focus  ")
+        #expect(item.text == "Focus")
+        #expect(store.oneThing?.text == "Focus")
     }
 
     @Test("rejects text longer than 40 characters")
@@ -65,6 +79,15 @@ struct WedgeStoreTests {
         #expect(store.completeOneThing() == nil)
     }
 
+    @Test("completing the last item leaves empty icon-only state")
+    func completeLastItemEmpties() throws {
+        let store = WedgeStore()
+        _ = try store.add("Only")
+        #expect(store.completeOneThing()?.text == "Only")
+        #expect(store.oneThing == nil)
+        #expect(store.items.isEmpty)
+    }
+
     @Test("delete removes by id")
     func deleteById() throws {
         let store = WedgeStore()
@@ -72,6 +95,15 @@ struct WedgeStoreTests {
         _ = try store.add("B")
         store.delete(id: a.id)
         #expect(store.items.map(\.text) == ["B"])
+        #expect(store.oneThing?.text == "B")
+    }
+
+    @Test("delete unknown id is a no-op")
+    func deleteUnknownId() throws {
+        let store = WedgeStore()
+        _ = try store.add("A")
+        store.delete(id: UUID())
+        #expect(store.items.map(\.text) == ["A"])
     }
 
     @Test("update enforces max length")
@@ -81,6 +113,33 @@ struct WedgeStoreTests {
         #expect(throws: WedgeStoreError.textTooLong(max: 40)) {
             try store.update(id: item.id, text: String(repeating: "x", count: 41))
         }
+        #expect(store.oneThing?.text == "Hi")
+    }
+
+    @Test("update rejects empty after trim")
+    func updateRejectsEmpty() throws {
+        let store = WedgeStore()
+        let item = try store.add("Keep")
+        #expect(throws: WedgeStoreError.emptyText) {
+            try store.update(id: item.id, text: "   ")
+        }
+        #expect(store.oneThing?.text == "Keep")
+    }
+
+    @Test("update trims and rewrites text")
+    func updateTrims() throws {
+        let store = WedgeStore()
+        let item = try store.add("Old")
+        try store.update(id: item.id, text: "  New  ")
+        #expect(store.oneThing?.text == "New")
+    }
+
+    @Test("update unknown id is a no-op")
+    func updateUnknownId() throws {
+        let store = WedgeStore()
+        _ = try store.add("A")
+        try store.update(id: UUID(), text: "Nope")
+        #expect(store.items.map(\.text) == ["A"])
     }
 
     @Test("move reorders items")
@@ -92,5 +151,14 @@ struct WedgeStoreTests {
         store.move(from: IndexSet(integer: 2), to: 0)
         #expect(store.items.map(\.text) == ["C", "A", "B"])
         #expect(store.oneThing?.text == "C")
+    }
+
+    @Test("replaceAll swaps the list")
+    func replaceAll() throws {
+        let store = WedgeStore()
+        _ = try store.add("Transient")
+        store.replaceAll([WedgeItem(text: "Loaded")])
+        #expect(store.items.map(\.text) == ["Loaded"])
+        #expect(store.oneThing?.text == "Loaded")
     }
 }
