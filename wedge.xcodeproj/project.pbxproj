@@ -32,16 +32,22 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FA6157783031B5F400315631 /* wedge */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = wedge;
 			sourceTree = "<group>";
 		};
 		FA6157863031B5F600315631 /* wedgeTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = wedgeTests;
 			sourceTree = "<group>";
 		};
 		FA6157903031B5F600315631 /* wedgeUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = wedgeUITests;
 			sourceTree = "<group>";
 		};
@@ -99,10 +105,15 @@
 			);
 			buildRules = (
 			);
+			dependencies = (
+			);
 			fileSystemSynchronizedGroups = (
 				FA6157783031B5F400315631 /* wedge */,
 			);
 			name = wedge;
+			packageProductDependencies = (
+				CA016BE5F6DEC09495513B87 /* KeyboardShortcuts */,
+			);
 			productName = wedge;
 			productReference = FA6157763031B5F400315631 /* wedge.app */;
 			productType = "com.apple.product-type.application";
@@ -181,6 +192,9 @@
 			);
 			mainGroup = FA61576D3031B5F400315631;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				579D8381C04DF08003977814 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA6157773031B5F400315631 /* Products */;
 			projectDirPath = "";
@@ -243,7 +257,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		FA6157933031B5F600315631 /* Debug configuration for PBXProject "wedge" */ = {
+		FA6157933031B5F600315631 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -306,7 +320,7 @@
 			};
 			name = Debug;
 		};
-		FA6157943031B5F600315631 /* Release configuration for PBXProject "wedge" */ = {
+		FA6157943031B5F600315631 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -361,7 +375,7 @@
 			};
 			name = Release;
 		};
-		FA6157963031B5F600315631 /* Debug configuration for PBXNativeTarget "wedge" */ = {
+		FA6157963031B5F600315631 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -394,7 +408,7 @@
 			};
 			name = Debug;
 		};
-		FA6157973031B5F600315631 /* Release configuration for PBXNativeTarget "wedge" */ = {
+		FA6157973031B5F600315631 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -427,7 +441,7 @@
 			};
 			name = Release;
 		};
-		FA6157993031B5F600315631 /* Debug configuration for PBXNativeTarget "wedgeTests" */ = {
+		FA6157993031B5F600315631 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -447,7 +461,7 @@
 			};
 			name = Debug;
 		};
-		FA61579A3031B5F600315631 /* Release configuration for PBXNativeTarget "wedgeTests" */ = {
+		FA61579A3031B5F600315631 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -467,7 +481,7 @@
 			};
 			name = Release;
 		};
-		FA61579C3031B5F600315631 /* Debug configuration for PBXNativeTarget "wedgeUITests" */ = {
+		FA61579C3031B5F600315631 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -485,7 +499,7 @@
 			};
 			name = Debug;
 		};
-		FA61579D3031B5F600315631 /* Release configuration for PBXNativeTarget "wedgeUITests" */ = {
+		FA61579D3031B5F600315631 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -509,37 +523,55 @@
 		FA6157713031B5F400315631 /* Build configuration list for PBXProject "wedge" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FA6157933031B5F600315631 /* Debug configuration for PBXProject "wedge" */,
-				FA6157943031B5F600315631 /* Release configuration for PBXProject "wedge" */,
+				FA6157933031B5F600315631 /* Debug */,
+				FA6157943031B5F600315631 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
 		FA6157953031B5F600315631 /* Build configuration list for PBXNativeTarget "wedge" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FA6157963031B5F600315631 /* Debug configuration for PBXNativeTarget "wedge" */,
-				FA6157973031B5F600315631 /* Release configuration for PBXNativeTarget "wedge" */,
+				FA6157963031B5F600315631 /* Debug */,
+				FA6157973031B5F600315631 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
 		FA6157983031B5F600315631 /* Build configuration list for PBXNativeTarget "wedgeTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FA6157993031B5F600315631 /* Debug configuration for PBXNativeTarget "wedgeTests" */,
-				FA61579A3031B5F600315631 /* Release configuration for PBXNativeTarget "wedgeTests" */,
+				FA6157993031B5F600315631 /* Debug */,
+				FA61579A3031B5F600315631 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
 		FA61579B3031B5F600315631 /* Build configuration list for PBXNativeTarget "wedgeUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FA61579C3031B5F600315631 /* Debug configuration for PBXNativeTarget "wedgeUITests" */,
-				FA61579D3031B5F600315631 /* Release configuration for PBXNativeTarget "wedgeUITests" */,
+				FA61579C3031B5F600315631 /* Debug */,
+				FA61579D3031B5F600315631 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		579D8381C04DF08003977814 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CA016BE5F6DEC09495513B87 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 579D8381C04DF08003977814 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FA61576E3031B5F400315631 /* Project object */;
-	validationLevel = 1;
 }
