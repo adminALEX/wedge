@@ -8,7 +8,7 @@ Plans and rules must stay aligned with this file and the phase docs when scope i
 |-------|--------|---------|-----|
 | **v1** | Shipped | Core menu-bar Wedge + panel, Settings, launch at login + 40-char limit | [phases/v1.md](phases/v1.md) · [implementation plan](../superpowers/plans/2026-08-16-wedge-v1.md) (historical) |
 | **v2** | Shipped | Global hotkeys (⌃⌥W / ⌃⌥D defaults) + remapping in Settings + denser panel keyboard | [phases/v2.md](phases/v2.md) · [plan](../superpowers/plans/2026-09-06-wedge-v2-hotkeys.md) |
-| **v3** | Implemented — pending manual acceptance | Settings: pop sound on/off + custom file, launch-at-login toggle | [phases/v3.md](phases/v3.md) |
+| **v3** | Shipped | Settings: pop sound on/off + custom file (≤3s), launch-at-login toggle | [phases/v3.md](phases/v3.md) · [plan](../superpowers/plans/2026-09-06-wedge-v3-settings.md) |
 
 ## Explicit non-goals (all phases)
 
