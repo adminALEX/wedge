@@ -113,7 +113,7 @@ final class StatusItemController: NSObject {
             button.attributedTitle = NSAttributedString(string: "")
             button.title = ""
             let image = NSImage(
-                systemSymbolName: "circle.fill",
+                systemSymbolName: "leaf",
                 accessibilityDescription: WedgeCopy.statusItemAccessibility
             )
             image?.isTemplate = true
