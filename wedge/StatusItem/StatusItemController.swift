@@ -1,4 +1,5 @@
 import AppKit
+import KeyboardShortcuts
 import SwiftUI
 
 extension Notification.Name {
@@ -51,6 +52,18 @@ final class StatusItemController: NSObject {
         ) { [weak self] _ in
             Task { @MainActor in
                 self?.restoreAccessoryPolicyIfIdle()
+            }
+        }
+
+        // Key-down matches AppKit menu shortcut timing; Carbon hotkeys are press-oriented.
+        KeyboardShortcuts.onKeyDown(for: .togglePanel) { [weak self] in
+            Task { @MainActor in
+                self?.togglePanel()
+            }
+        }
+        KeyboardShortcuts.onKeyDown(for: .markDone) { [weak self] in
+            Task { @MainActor in
+                self?.performDone()
             }
         }
     }
