@@ -16,9 +16,12 @@ struct PopoverContentView: View {
     var onDone: () -> Void
 
     @State private var draft = ""
-    @State private var selection: UUID?
     @State private var donePulse = false
-    @FocusState private var isAddFieldFocused: Bool
+    /// Which row is in edit mode (Text → TextField). Do not keep always-on
+    /// row TextFields inside `List` — macOS List + the focused add field
+    /// steals clicks and blocks inline edit.
+    @State private var editingItemID: UUID?
+    @FocusState private var focus: PanelFocus?
 
     private var addPlaceholder: String {
         store.items.isEmpty ? "What's your one thing?" : "Add to up next…"
@@ -34,7 +37,6 @@ struct PopoverContentView: View {
         .padding(.bottom, 14)
         .frame(width: 300)
         .opacity(donePulse ? 0.85 : 1)
-        // Hidden control so ⌘↩ still marks Done without a visible button.
         .background {
             Button("Done") { onDone() }
                 .keyboardShortcut(.return, modifiers: .command)
@@ -56,10 +58,11 @@ struct PopoverContentView: View {
     }
 
     private var list: some View {
-        List(selection: $selection) {
+        // No `selection:` — keeps native `onMove` drag while letting rows
+        // enter edit via tap-to-TextField.
+        List {
             ForEach(store.items) { item in
                 itemRow(item)
-                    .tag(item.id)
                     .listRowInsets(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
             }
             .onMove { indices, newOffset in
@@ -67,17 +70,18 @@ struct PopoverContentView: View {
                 onChange()
             }
             .onDelete { indexSet in
-                // Resolve IDs up front: deleting by index while mutating the
-                // same array would shift the remaining offsets.
                 let ids = indexSet.map { store.items[$0].id }
                 ids.forEach { store.delete(id: $0) }
+                if let editingItemID, ids.contains(editingItemID) {
+                    self.editingItemID = nil
+                }
                 onChange()
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .frame(maxHeight: .infinity)
-        .onDeleteCommand { deleteSelection() }
+        .onDeleteCommand { deleteFocusedItem() }
     }
 
     private func itemRow(_ item: WedgeItem) -> some View {
@@ -86,6 +90,20 @@ struct PopoverContentView: View {
             ItemRow(
                 item: item,
                 isOneThing: item.id == store.oneThing?.id,
+                isEditing: editingItemID == item.id,
+                focus: $focus,
+                onStartEditing: {
+                    editingItemID = item.id
+                    focus = .item(item.id)
+                },
+                onEndEditing: {
+                    if editingItemID == item.id {
+                        editingItemID = nil
+                    }
+                    if focus == .item(item.id) {
+                        focus = .add
+                    }
+                },
                 commit: { newText in
                     do {
                         try store.update(id: item.id, text: newText)
@@ -101,7 +119,7 @@ struct PopoverContentView: View {
         .contextMenu {
             Button("Delete") {
                 store.delete(id: item.id)
-                if selection == item.id { selection = nil }
+                if editingItemID == item.id { editingItemID = nil }
                 onChange()
             }
         }
@@ -110,21 +128,31 @@ struct PopoverContentView: View {
     private var addField: some View {
         TextField(addPlaceholder, text: $draft)
             .textFieldStyle(.roundedBorder)
-            .focused($isAddFieldFocused)
+            .focused($focus, equals: .add)
             .onSubmit { submitDraft() }
+            .onChange(of: focus) { _, newFocus in
+                if newFocus == .add { editingItemID = nil }
+            }
     }
 
     private func focusAddField() {
-        // Defer until the panel is key so AppKit focus sticks.
+        editingItemID = nil
         DispatchQueue.main.async {
-            isAddFieldFocused = true
+            focus = .add
         }
     }
 
-    private func deleteSelection() {
-        guard let selection else { return }
-        store.delete(id: selection)
-        self.selection = nil
+    private func deleteFocusedItem() {
+        let id: UUID?
+        if case .item(let editingID) = focus {
+            id = editingID
+        } else {
+            id = editingItemID
+        }
+        guard let id else { return }
+        store.delete(id: id)
+        editingItemID = nil
+        focus = .add
         onChange()
     }
 
@@ -133,10 +161,16 @@ struct PopoverContentView: View {
             _ = try store.add(draft)
             draft = ""
             onChange()
+            focus = .add
         } catch {
             NSSound.beep()
         }
     }
+}
+
+private enum PanelFocus: Hashable {
+    case add
+    case item(UUID)
 }
 
 /// Notion-style 2×3 grip — visual affordance; reorder still uses `List`/`onMove`.
@@ -156,36 +190,76 @@ private struct NotionDragHandle: View {
     }
 }
 
-/// A single editable row. Keeps its own draft text so the store is only
-/// mutated on submit or blur — editing through the store on every keystroke
-/// would reject transient empty/whitespace states mid-typing.
+/// Idle rows show `Text` (List-clickable); tap swaps in a focused `TextField`.
+/// Commits on Return or when edit mode ends.
 private struct ItemRow: View {
     let item: WedgeItem
     let isOneThing: Bool
+    let isEditing: Bool
+    var focus: FocusState<PanelFocus?>.Binding
+    let onStartEditing: () -> Void
+    let onEndEditing: () -> Void
     let commit: (String) -> Bool
 
     @State private var text: String
-    @FocusState private var isFocused: Bool
 
-    init(item: WedgeItem, isOneThing: Bool, commit: @escaping (String) -> Bool) {
+    init(
+        item: WedgeItem,
+        isOneThing: Bool,
+        isEditing: Bool,
+        focus: FocusState<PanelFocus?>.Binding,
+        onStartEditing: @escaping () -> Void,
+        onEndEditing: @escaping () -> Void,
+        commit: @escaping (String) -> Bool
+    ) {
         self.item = item
         self.isOneThing = isOneThing
+        self.isEditing = isEditing
+        self.focus = focus
+        self.onStartEditing = onStartEditing
+        self.onEndEditing = onEndEditing
         self.commit = commit
         _text = State(initialValue: item.text)
     }
 
     var body: some View {
-        TextField("Item", text: $text)
-            .textFieldStyle(.plain)
-            .font(isOneThing ? .body.weight(.semibold) : .body)
-            .focused($isFocused)
-            .onSubmit { commitDraft() }
-            .onChange(of: isFocused) { _, focused in
-                if !focused { commitDraft() }
+        Group {
+            if isEditing {
+                TextField("Item", text: $text)
+                    .textFieldStyle(.plain)
+                    .font(rowFont)
+                    .focused(focus, equals: .item(item.id))
+                    .onSubmit {
+                        commitDraft()
+                        onEndEditing()
+                    }
+                    .onAppear {
+                        DispatchQueue.main.async {
+                            focus.wrappedValue = .item(item.id)
+                        }
+                    }
+            } else {
+                Text(text)
+                    .font(rowFont)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: 1) {
+                        onStartEditing()
+                    }
             }
-            .onChange(of: item.text) { _, newText in
-                if !isFocused { text = newText }
+        }
+        .onChange(of: isEditing) { wasEditing, editing in
+            if wasEditing && !editing {
+                commitDraft()
             }
+        }
+        .onChange(of: item.text) { _, newText in
+            if !isEditing { text = newText }
+        }
+    }
+
+    private var rowFont: Font {
+        isOneThing ? .body.weight(.semibold) : .body
     }
 
     private func commitDraft() {
