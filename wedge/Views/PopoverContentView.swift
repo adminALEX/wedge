@@ -16,10 +16,10 @@ struct PopoverContentView: View {
     var onDone: () -> Void
 
     @State private var draft = ""
+    @State private var selection: UUID?
     @State private var donePulse = false
-    /// Which row is in edit mode (Text → TextField). Do not keep always-on
-    /// row TextFields inside `List` — macOS List + the focused add field
-    /// steals clicks and blocks inline edit.
+    /// Which row is in edit mode (Text → TextField). Selection drives ↑/↓/⌫;
+    /// tap-to-edit keeps TextFields from fighting List selection.
     @State private var editingItemID: UUID?
     @FocusState private var focus: PanelFocus?
 
@@ -58,11 +58,10 @@ struct PopoverContentView: View {
     }
 
     private var list: some View {
-        // No `selection:` — keeps native `onMove` drag while letting rows
-        // enter edit via tap-to-TextField.
-        List {
+        List(selection: $selection) {
             ForEach(store.items) { item in
                 itemRow(item)
+                    .tag(item.id)
                     .listRowInsets(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
             }
             .onMove { indices, newOffset in
@@ -75,13 +74,16 @@ struct PopoverContentView: View {
                 if let editingItemID, ids.contains(editingItemID) {
                     self.editingItemID = nil
                 }
+                if let selection, ids.contains(selection) {
+                    self.selection = nil
+                }
                 onChange()
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .frame(maxHeight: .infinity)
-        .onDeleteCommand { deleteFocusedItem() }
+        .onDeleteCommand { deleteSelectedItem() }
     }
 
     private func itemRow(_ item: WedgeItem) -> some View {
@@ -120,6 +122,7 @@ struct PopoverContentView: View {
             Button("Delete") {
                 store.delete(id: item.id)
                 if editingItemID == item.id { editingItemID = nil }
+                if selection == item.id { selection = nil }
                 onChange()
             }
         }
@@ -137,22 +140,18 @@ struct PopoverContentView: View {
 
     private func focusAddField() {
         editingItemID = nil
+        selection = nil
         DispatchQueue.main.async {
             focus = .add
         }
     }
 
-    private func deleteFocusedItem() {
-        let id: UUID?
-        if case .item(let editingID) = focus {
-            id = editingID
-        } else {
-            id = editingItemID
-        }
-        guard let id else { return }
+    private func deleteSelectedItem() {
+        // ponytail: List selection owns ⌫; TextFields own ⌫ while focused
+        guard editingItemID == nil, focus != .add else { return }
+        guard let id = selection else { return }
         store.delete(id: id)
-        editingItemID = nil
-        focus = .add
+        selection = nil
         onChange()
     }
 
