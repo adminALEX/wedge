@@ -1,23 +1,48 @@
 import AppKit
 
-/// Plays the bundled Done confirmation sound (`Sounds/pop-sound.mp3`).
-///
-/// The `NSSound` is retained for the lifetime of the player: a sound released
-/// while still playing is deallocated mid-playback and goes silent.
+/// Plays the Done confirmation sound (bundled default or custom).
 @MainActor
 final class PopSoundPlayer {
-    private lazy var sound: NSSound? = Self.loadBundledSound()
+    private var sound: NSSound?
+    private var observer: NSObjectProtocol?
+
+    init() {
+        reload()
+        observer = NotificationCenter.default.addObserver(
+            forName: .wedgePopSoundPreferencesDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.reload()
+            }
+        }
+    }
+
+    deinit {
+        if let observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
 
     func play() {
+        guard PopSoundPreferences.isEnabled() else { return }
         guard let sound else {
             NSSound.beep()
             return
         }
-        // Rapid Done presses would otherwise be swallowed: play() on an
-        // already-playing NSSound is a no-op.
         sound.stop()
         if !sound.play() {
             NSSound.beep()
+        }
+    }
+
+    func reload() {
+        sound?.stop()
+        if let custom = PopSoundPreferences.customSoundURL() {
+            sound = NSSound(contentsOf: custom, byReference: false)
+        } else {
+            sound = Self.loadBundledSound()
         }
     }
 
