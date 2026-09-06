@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "type": "prompt",
+        "timeout": 15,
+        "loop_limit": 1,
+        "prompt": "Review this agent turn for Wedge alignment. If the user confirmed a product/scope/language change, or implementation finished that should update plans/docs/rules, set followup_message to tell the agent to run the wedge-keep-aligned skill (update .cursor/rules and any existing docs/plans; do not invent new roadmap docs unless the user asked). If nothing needs syncing, do not set a followup. Hook input: $ARGUMENTS"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": ".cursor/hooks/after-git-commit.sh",
+        "matcher": "Shell"
+      }
+    ]
+  }
+}
