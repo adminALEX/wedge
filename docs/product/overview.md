@@ -1,6 +1,6 @@
 # Wedge — Product overview
 
-Wedge is a minimal macOS **menu-bar** utility. It stays out of the way and keeps one clear focus visible at all times.
+Wedge is a minimal macOS **menu-bar** utility. It stays out of the way and keeps one clear focus visible at all times. **Requires macOS 15 Sequoia** or later.
 
 ## Idea
 

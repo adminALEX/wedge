@@ -2,6 +2,8 @@
 
 macOS menu-bar focus list. Product docs: [docs/product/overview.md](docs/product/overview.md).
 
+**Requires macOS 15 Sequoia** or later.
+
 ## Develop
 
 1. Open `wedge.xcodeproj` in Xcode.
