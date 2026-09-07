@@ -9,7 +9,7 @@ Canonical docs: `docs/product/overview.md`, `docs/product/roadmap.md`, `docs/pro
 
 ## What Wedge is
 
-macOS **menu-bar only** utility (OneThing-adjacent). The bar shows the **one thing** (list index 0). Everything else is **Up next**, ordered by drag. Position = priority — no priority fields. **Done** (pop + sound) is the emotional core.
+macOS **menu-bar only** utility (OneThing-adjacent). **Requires macOS 15 Sequoia** or later. The bar shows the **one thing** (list index 0). Everything else is **Up next**, ordered by drag. Position = priority — no priority fields. **Done** (pop + sound) is the emotional core.
 
 ## Language
 
