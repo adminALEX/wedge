@@ -8,17 +8,35 @@ enum DoneMoment {
     static let titleSpring = Animation.spring(response: 0.32, dampingFraction: 0.6)
     static let swellScale: CGFloat = 1.06
     static let popScale: CGFloat = 0.6
-    /// From the check to the start of the pop.
+    /// From the ring's check to the start of the swell.
+    static let ringBeat: Duration = .milliseconds(60)
+    /// From the start of the swell to the start of the pop.
     static let swellDuration: Duration = .milliseconds(100)
     /// From the check until the completed row leaves and the next row starts to rise.
-    static let popDuration: Duration = .milliseconds(250)
+    static let popDuration: Duration = .milliseconds(280)
     /// The rise: removing the completed row and moving the rows below up.
-    static let rise = Animation.spring(response: 0.2, dampingFraction: 1)
+    static let rise = Animation.spring(response: 0.18, dampingFraction: 1)
     static let undoHintDuration: Duration = .seconds(4)
     static let undoHintFade = Animation.easeOut(duration: 0.2)
 
     static func animates(panelVisible: Bool, reduceMotion: Bool) -> Bool {
         panelVisible && !reduceMotion
+    }
+
+    /// What a Done does in the panel, decided once, when it arrives.
+    struct Arrival: Equatable {
+        /// The completed row leaves at once (no pop, no rise).
+        let settlesNow: Bool
+        /// "Undo Done ⌘Z" is shown for this Done.
+        let armsUndoHint: Bool
+    }
+
+    /// A Done while the panel is hidden never animates and never shows the hint later (R19);
+    /// under Reduce Motion it swaps at once but still shows the hint.
+    static func arrival(panelVisible: Bool, reduceMotion: Bool) -> Arrival {
+        Arrival(
+            settlesNow: !animates(panelVisible: panelVisible, reduceMotion: reduceMotion),
+            armsUndoHint: panelVisible)
     }
 
     /// The event whose completed item still holds the Now slot: the last Done, until it has
@@ -45,7 +63,7 @@ struct DonePopRow: View {
     }
 
     private struct Pop: View {
-        private enum Phase { case idle, swell, pop }
+        private enum Phase { case idle, checked, swell, pop }
 
         let item: WedgeItem
         @State private var phase = Phase.idle
@@ -66,6 +84,8 @@ struct DonePopRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .task {
+                withAnimation(DoneMoment.titleSpring) { phase = .checked }
+                do { try await Task.sleep(for: DoneMoment.ringBeat) } catch { return }
                 withAnimation(DoneMoment.titleSpring) { phase = .swell }
                 do { try await Task.sleep(for: DoneMoment.swellDuration) } catch { return }
                 withAnimation(DoneMoment.titleSpring) { phase = .pop }
@@ -74,7 +94,7 @@ struct DonePopRow: View {
 
         private var scale: CGFloat {
             switch phase {
-            case .idle: 1
+            case .idle, .checked: 1
             case .swell: DoneMoment.swellScale
             case .pop: DoneMoment.popScale
             }

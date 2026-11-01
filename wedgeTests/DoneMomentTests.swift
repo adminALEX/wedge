@@ -16,6 +16,22 @@ struct DoneMomentTests {
         #expect(!DoneMoment.animates(panelVisible: false, reduceMotion: false))
     }
 
+    @Test func doneWhileHiddenSettlesAtOnceWithoutHint() {
+        let arrival = DoneMoment.arrival(panelVisible: false, reduceMotion: false)
+        #expect(arrival == DoneMoment.Arrival(settlesNow: true, armsUndoHint: false))
+        #expect(!DoneMoment.arrival(panelVisible: false, reduceMotion: true).armsUndoHint)
+    }
+
+    @Test func doneWhileVisibleAnimatesAndArmsHint() {
+        let arrival = DoneMoment.arrival(panelVisible: true, reduceMotion: false)
+        #expect(arrival == DoneMoment.Arrival(settlesNow: false, armsUndoHint: true))
+    }
+
+    @Test func doneUnderReduceMotionSwapsAtOnceButShowsHint() {
+        let arrival = DoneMoment.arrival(panelVisible: true, reduceMotion: true)
+        #expect(arrival == DoneMoment.Arrival(settlesNow: true, armsUndoHint: true))
+    }
+
     @Test func unsettledEventHoldsTheNowSlot() {
         let event = event
         #expect(DoneMoment.completing(event, settledID: nil, items: [next], animates: true) == event)
@@ -53,6 +69,7 @@ struct DoneMomentTests {
         #expect(DoneMoment.swellScale == 1.06)
         #expect(DoneMoment.popScale == 0.6)
         #expect(DoneMoment.undoHintDuration == .seconds(4))
-        #expect(DoneMoment.swellDuration < DoneMoment.popDuration)
+        #expect(DoneMoment.ringBeat == .milliseconds(60))
+        #expect(DoneMoment.ringBeat + DoneMoment.swellDuration < DoneMoment.popDuration)
     }
 }

@@ -76,14 +76,18 @@ struct PanelView: View {
         .background { shortcuts }
         .defaultFocus($focus, .add)
         .onChange(of: panel.isVisible) { _, isVisible in
-            if isVisible { focusAddField() }
+            guard isVisible else { return }
+            // Any Done so far happened while the panel was hidden: it never plays (R19).
+            settledEventID = doneAction.lastEvent?.id
+            focusAddField()
         }
         .onChange(of: store.items.isEmpty) { _, isEmpty in
             // The list went away (last row deleted or Done) and took focus with it.
             if isEmpty { focusAddField() }
         }
-        .task(id: doneAction.lastEvent?.id) { await settleDoneMoment() }
-        .task(id: doneAction.lastEvent?.id) { await showUndoHint() }
+        .onChange(of: doneAction.lastEvent?.id) { _, id in doneArrived(id) }
+        .task(id: doneAction.lastEvent?.id) { await riseAfterPop() }
+        .task(id: hintEventID) { await expireUndoHint() }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(WedgeCopy.appName)
     }
@@ -121,22 +125,27 @@ struct PanelView: View {
             hintEventID: hintEventID, lastEventID: doneAction.lastEvent?.id, canUndoDone: store.canUndoDone)
     }
 
+    /// Decides, as the Done arrives, whether it plays and shows the hint (`DoneMoment.arrival`).
+    private func doneArrived(_ id: UUID?) {
+        guard let id else { return }
+        let arrival = DoneMoment.arrival(panelVisible: panel.isVisible, reduceMotion: reduceMotion)
+        if arrival.settlesNow { settledEventID = id }
+        if arrival.armsUndoHint {
+            withAnimation(reduceMotion ? nil : DoneMoment.undoHintFade) { hintEventID = id }
+        }
+    }
+
     /// Lets the completed row pop, then removes it so the next row rises. A newer Done cancels
     /// this task and starts its own, so the moment restarts from the new state.
-    private func settleDoneMoment() async {
-        guard let id = doneAction.lastEvent?.id else { return }
-        guard animatesDone else {
-            settledEventID = id
-            return
-        }
+    private func riseAfterPop() async {
+        guard let id = doneAction.lastEvent?.id, id != settledEventID, animatesDone else { return }
         do { try await Task.sleep(for: DoneMoment.popDuration) } catch { return }
         withAnimation(DoneMoment.rise) { settledEventID = id }
     }
 
-    /// Shows "Undo Done ⌘Z" for 4 s after each Done (hidden sooner if undo is no longer possible).
-    private func showUndoHint() async {
-        guard let id = doneAction.lastEvent?.id else { return }
-        withAnimation(reduceMotion ? nil : DoneMoment.undoHintFade) { hintEventID = id }
+    /// Hides "Undo Done ⌘Z" 4 s after it appears (sooner if undo is no longer possible).
+    private func expireUndoHint() async {
+        guard hintEventID != nil else { return }
         do { try await Task.sleep(for: DoneMoment.undoHintDuration) } catch { return }
         withAnimation(reduceMotion ? nil : DoneMoment.undoHintFade) { hintEventID = nil }
     }
