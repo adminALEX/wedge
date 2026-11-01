@@ -31,7 +31,7 @@ struct WedgeSettingsView: View {
             Section {
                 Toggle(WedgeCopy.playSound, isOn: $soundEnabled)
                 HStack {
-                    Text(customName.map(WedgeCopy.customPopSoundLabel) ?? WedgeCopy.defaultPopSound)
+                    Text(customName.map { WedgeCopy.customPopSoundLabel($0) } ?? WedgeCopy.defaultPopSound)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                     Spacer()
@@ -69,9 +69,6 @@ struct WedgeSettingsView: View {
                 }
             } header: {
                 Text(WedgeCopy.keyboardShortcutsSection)
-            } footer: {
-                Text(WedgeCopy.keyboardShortcutsFooter)
-                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

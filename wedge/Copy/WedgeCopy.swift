@@ -52,7 +52,4 @@ enum WedgeCopy {
     static let togglePanelShortcut = "Toggle panel"
     static var doneShortcut: String { done }
     static let resetToDefaults = "Reset to defaults"
-    static var keyboardShortcutsFooter: String {
-        "Defaults are ⌃⌥W (toggle panel) and ⌃⌥D (\(done)). Prefer chords that include Control or Command — Option/Shift-only remaps can fail on some macOS 15 versions. Remapping saves automatically."
-    }
 }
