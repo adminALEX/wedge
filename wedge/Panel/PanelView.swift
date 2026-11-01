@@ -91,7 +91,7 @@ struct PanelView: View {
         .task(id: hintEventID) { await expireUndoHint() }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(WedgeCopy.appName)
-        .accessibilityValue(focusTrace.joined(separator: " > "))
+        .accessibilityValue("trace: " + focusTrace.joined(separator: " > "))
         .onChange(of: focus) { old, new in
             focusTrace.append("\(String(describing: old))->\(String(describing: new))")
         }

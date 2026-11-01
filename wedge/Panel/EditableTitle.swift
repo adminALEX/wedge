@@ -59,6 +59,7 @@ struct EditableTitle: View {
             // Not onAppear: the List mounts the row's new field after this update, and focus set
             // before then is dropped (the field showed without a caret). The task runs once it is in.
             .task { focus.wrappedValue = .row(item.id) }
+            .background(DiagGrab())
             .onDisappear { onCommit() }  // the row was deleted, completed or the list went away
             .padding(.horizontal, 4)
             .background(Color(nsColor: .textBackgroundColor), in: .rect(cornerRadius: Self.cornerRadius))
