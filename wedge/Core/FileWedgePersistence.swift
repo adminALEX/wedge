@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Stores items as `{"version":1,"items":[…]}` in `<directory>/wedge.json`.
 final class FileWedgePersistence: WedgePersisting {
