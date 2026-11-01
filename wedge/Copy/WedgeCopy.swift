@@ -38,7 +38,6 @@ enum WedgeCopy {
     static let addToUpNextTitle = "Add to Up Next"
     static let markDoneTitle = "Mark Done"
     static let getNowTitle = "Get Now"
-    static let addToUpNextPrompt = "What do you want to add?"
     static let addedToUpNext = "Added to Up Next."
     static let nothingToMarkDone = "Nothing to mark done."
     static func nowIs(_ text: String) -> String { "\(now): \(text)" }

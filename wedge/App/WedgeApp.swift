@@ -28,12 +28,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Registered as early as possible so an intent that launches Wedge in the background can
     /// resolve them, but as lazy factories: the environment is still built on first use only.
-    /// Intents resolve their dependencies on the main actor. The unit tests call the intents'
-    /// static `run` functions directly.
+    /// The system may call a factory from any queue, so each is an async main-actor closure and
+    /// the runtime hops to the main actor. The unit tests call the intents' static `run`
+    /// functions directly.
     private func registerIntentDependencies() {
         guard mode != .unitTest else { return }
-        AppDependencyManager.shared.add { MainActor.assumeIsolated { self.environment.store } }
-        AppDependencyManager.shared.add { MainActor.assumeIsolated { self.environment.doneAction } }
+        let store: @Sendable () async -> WedgeStore = { @MainActor in
+            Log.done.debug("Resolving intent dependency: store")
+            return self.environment.store
+        }
+        let doneAction: @Sendable () async -> DoneAction = { @MainActor in
+            Log.done.debug("Resolving intent dependency: doneAction")
+            return self.environment.doneAction
+        }
+        AppDependencyManager.shared.add(key: nil, dependency: store)
+        AppDependencyManager.shared.add(key: nil, dependency: doneAction)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
