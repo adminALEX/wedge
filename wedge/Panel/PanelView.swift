@@ -15,7 +15,8 @@ struct RowEdit: Equatable {
 
 /// The panel content (spec §3.1, A1) on Liquid Glass: issue banner, the Now label and the list
 /// (Now, Up Next), add field and hint row. Owns focus, selection, the add draft and the inline
-/// edit, so ⌘Z can tell unsaved typing from Undo Done.
+/// edit, so ⌘Z can tell unsaved typing from Undo Done. Also plays the Done moment (§3.2): it
+/// keeps the completed row in the Now slot until it has popped, and shows the undo hint.
 struct PanelView: View {
     let store: WedgeStore
     let doneAction: DoneAction
@@ -23,6 +24,11 @@ struct PanelView: View {
     let announce: (String) -> Void
 
     @Environment(PanelController.self) private var panel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The last Done whose completed row has left the Now slot.
+    @State private var settledEventID: UUID?
+    /// The Done the undo hint is showing for; nil once its time is up.
+    @State private var hintEventID: UUID?
     @State private var draft = ""
     @State private var selection: UUID?
     @State private var edit: RowEdit?
@@ -33,13 +39,14 @@ struct PanelView: View {
             if let issue = store.issue {
                 IssueBanner(issue: issue)
             }
-            if !store.items.isEmpty {
+            if !store.items.isEmpty || completing != nil {
                 VStack(alignment: .leading, spacing: 4) {
                     SectionLabel(WedgeCopy.now)
                     ItemList(
                         store: store,
                         doneAction: doneAction,
                         announce: announce,
+                        completing: completing,
                         selection: $selection,
                         edit: $edit,
                         focus: $focus,
@@ -57,6 +64,10 @@ struct PanelView: View {
             Text(WedgeCopy.panelHint)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .overlay(alignment: .trailing) {
+                    if showsUndoHint { UndoHint().transition(.opacity) }
+                }
         }
         .padding(12)
         .frame(width: PanelAnchor.width)
@@ -71,6 +82,8 @@ struct PanelView: View {
             // The list went away (last row deleted or Done) and took focus with it.
             if isEmpty { focusAddField() }
         }
+        .task(id: doneAction.lastEvent?.id) { await settleDoneMoment() }
+        .task(id: doneAction.lastEvent?.id) { await showUndoHint() }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(WedgeCopy.appName)
     }
@@ -91,6 +104,41 @@ struct PanelView: View {
         .opacity(0)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    private var animatesDone: Bool {
+        DoneMoment.animates(panelVisible: panel.isVisible, reduceMotion: reduceMotion)
+    }
+
+    /// Worked out in `body`, so the completed row holds the Now slot from the very first frame.
+    private var completing: DoneEvent? {
+        DoneMoment.completing(
+            doneAction.lastEvent, settledID: settledEventID, items: store.items, animates: animatesDone)
+    }
+
+    private var showsUndoHint: Bool {
+        DoneMoment.showsUndoHint(
+            hintEventID: hintEventID, lastEventID: doneAction.lastEvent?.id, canUndoDone: store.canUndoDone)
+    }
+
+    /// Lets the completed row pop, then removes it so the next row rises. A newer Done cancels
+    /// this task and starts its own, so the moment restarts from the new state.
+    private func settleDoneMoment() async {
+        guard let id = doneAction.lastEvent?.id else { return }
+        guard animatesDone else {
+            settledEventID = id
+            return
+        }
+        do { try await Task.sleep(for: DoneMoment.popDuration) } catch { return }
+        withAnimation(DoneMoment.rise) { settledEventID = id }
+    }
+
+    /// Shows "Undo Done ⌘Z" for 4 s after each Done (hidden sooner if undo is no longer possible).
+    private func showUndoHint() async {
+        guard let id = doneAction.lastEvent?.id else { return }
+        withAnimation(reduceMotion ? nil : DoneMoment.undoHintFade) { hintEventID = id }
+        do { try await Task.sleep(for: DoneMoment.undoHintDuration) } catch { return }
+        withAnimation(reduceMotion ? nil : DoneMoment.undoHintFade) { hintEventID = nil }
     }
 
     private var undoRoute: UndoRoute {

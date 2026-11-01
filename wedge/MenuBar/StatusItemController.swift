@@ -15,6 +15,8 @@ final class StatusItemController: NSObject {
     private var suppressNextLeftMouseUp = false
     /// Whether the panel was showing when the current click began; decides what its mouseUp does.
     private var panelWasVisibleAtMouseDown = false
+    /// The last Done the button has bumped for.
+    private var bumpedEventID: UUID?
 
     init(
         store: WedgeStore, settings: WedgeSettings, doneAction: DoneAction,
@@ -43,6 +45,8 @@ final class StatusItemController: NSObject {
         }
         track { [weak self] in self?.render() }
         track { [weak self] in self?.syncHighlight() }
+        // Tracked after `render`, so the title has swapped by the time the bump plays.
+        track { [weak self] in self?.bumpOnDone() }
     }
 
     /// Runs `body` now and again after every change to anything it read.
@@ -70,6 +74,15 @@ final class StatusItemController: NSObject {
             button.imagePosition = .imageOnly
         }
         button.setAccessibilityLabel(StatusItemTitle.accessibilityLabel(now: now))
+    }
+
+    /// Bumps the button once per Done, whether or not the panel is visible (spec §3.2).
+    private func bumpOnDone() {
+        let id = doneAction.lastEvent?.id
+        guard id != bumpedEventID else { return }
+        bumpedEventID = id
+        guard id != nil, let button = statusItem?.button else { return }
+        StatusItemBump.play(on: button)
     }
 
     /// The template glyph; an SF Symbol stands in until the asset ships.

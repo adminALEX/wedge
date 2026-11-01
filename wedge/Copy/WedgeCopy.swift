@@ -16,6 +16,7 @@ enum WedgeCopy {
     static let addNowPlaceholder = "What are you on now?"
     static let addUpNextPlaceholder = "Add to Up Next…"
     static let panelHint = "⌘↩ Done · ⌘, Settings"
+    static let undoHint = "Undo Done ⌘Z"
     static let maxCharacters = "40 characters max"
     static let cantBeEmpty = "Can't be empty"
     static let moveUp = "Move Up"

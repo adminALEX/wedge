@@ -27,7 +27,7 @@ struct EditableTitle: View {
                 Text(item.text)
                     .font(font)
                     .lineLimit(1)
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, NowRowStyle.titlePadding)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(.rect)
                     .onTapGesture(perform: onStart)

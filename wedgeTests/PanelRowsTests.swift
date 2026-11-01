@@ -48,4 +48,32 @@ struct PanelRowsTests {
     @Test func labelIsNeverASource() {
         #expect(PanelRows.storeMove(from: [1], to: 0).offsets.isEmpty)
     }
+
+    @Test func completingItemHoldsNowSlotAndKeepsItsIdentity() {
+        let done = items[0]
+        let event = DoneEvent(id: UUID(), completed: done, next: items[1])
+        let rows = PanelRows.rows(for: Array(items.dropFirst()), completing: event)
+        #expect(rows.count == 5)
+        #expect(rows[0] == .completing(event))
+        #expect(rows[0].id == .item(done.id))
+        #expect(rows[1] == .upNextLabel)
+        #expect(rows[2] == .item(items[1], position: 2))
+        #expect(rows[4] == .item(items[3], position: 4))
+    }
+
+    @Test func completingLastItemIsTheOnlyRow() {
+        let event = DoneEvent(id: UUID(), completed: items[0], next: nil)
+        #expect(PanelRows.rows(for: [], completing: event) == [.completing(event)])
+    }
+
+    @Test func selectionKeptWhileItsItemExists() {
+        #expect(PanelRows.retargetedSelection(items[2].id, in: items) == items[2].id)
+        #expect(PanelRows.retargetedSelection(nil, in: items) == nil)
+    }
+
+    @Test func selectionOfCompletedItemMovesToNewNow() {
+        let completed = WedgeItem(text: "Gone")
+        #expect(PanelRows.retargetedSelection(completed.id, in: items) == items[0].id)
+        #expect(PanelRows.retargetedSelection(completed.id, in: []) == nil)
+    }
 }

@@ -21,6 +21,7 @@ struct WedgeCopyTests {
     @Test("panel copy matches the spec")
     func panelCopy() {
         #expect(WedgeCopy.panelHint == "⌘↩ Done · ⌘, Settings")
+        #expect(WedgeCopy.undoHint == "Undo Done ⌘Z")
         #expect(WedgeCopy.maxCharacters == "40 characters max")
         #expect(WedgeCopy.cantBeEmpty == "Can't be empty")
         #expect(WedgeCopy.nowAccessibility("Ship it") == "Now, Ship it")

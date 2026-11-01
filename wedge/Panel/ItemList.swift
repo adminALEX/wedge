@@ -3,6 +3,8 @@ import SwiftUI
 /// The list: Now as row 1 (the ring header), the Up Next label, then Up Next rows numbered
 /// from 2. Rows drag by their whole body (onto the top to become Now); click or ↩ edits in
 /// place; ⌫ deletes; ⌥⌘↑/↓ and the VoiceOver Move Up / Move Down actions reorder.
+/// During the Done moment the completed item holds the Now slot; rows keep their identity
+/// (`item.id`), so when it leaves the List animates the next row up into its place.
 struct ItemList: View {
     static let rowHeight: CGFloat = 28
     static let nowRowHeight: CGFloat = 36
@@ -12,6 +14,8 @@ struct ItemList: View {
     let store: WedgeStore
     let doneAction: DoneAction
     let announce: (String) -> Void
+    /// The Done whose completed item still holds the Now slot (see `DoneMoment`).
+    let completing: DoneEvent?
     @Binding var selection: UUID?
     @Binding var edit: RowEdit?
     var focus: FocusState<PanelFocus?>.Binding
@@ -25,10 +29,16 @@ struct ItemList: View {
 
     var body: some View {
         List(selection: $selection) {
-            ForEach(PanelRows.rows(for: store.items)) { row in
+            ForEach(PanelRows.rows(for: store.items, completing: completing)) { row in
                 switch row {
                 case .item(let item, let position):
                     itemRow(item, position: position).tag(item.id)
+                case .completing(let event):
+                    DonePopRow(event: event)
+                        .frame(minHeight: Self.nowRowHeight)
+                        .moveDisabled(true)
+                        .selectionDisabled(true)
+                        .accessibilityHidden(true)  // Done already announced the result
                 case .upNextLabel:
                     VStack(alignment: .leading, spacing: 6) {
                         Divider()
@@ -40,6 +50,7 @@ struct ItemList: View {
                 }
             }
             .onMove { offsets, destination in
+                guard completing == nil else { return }  // display offsets don't map to the store yet
                 let move = PanelRows.storeMove(from: offsets, to: destination)
                 guard !move.offsets.isEmpty else { return }
                 store.move(fromOffsets: move.offsets, toOffset: move.destination)
@@ -54,6 +65,9 @@ struct ItemList: View {
         .frame(height: height)
         .focused(focus, equals: .list)
         .modifier(ItemListKeys(list: self))
+        .onChange(of: store.items) { _, items in
+            selection = PanelRows.retargetedSelection(selection, in: items)
+        }
         .onChange(of: focus.wrappedValue) { old, new in
             if case .row(let id) = old, new != old, edit?.id == id { commit() }
         }
@@ -72,7 +86,7 @@ struct ItemList: View {
         let isEditing = edit?.id == item.id
         let title = EditableTitle(
             item: item,
-            font: isNow ? .title3.weight(.semibold) : .body,
+            font: isNow ? NowRowStyle.titleFont : .body,
             isEditing: isEditing,
             text: editText,
             refused: $refused,
@@ -110,8 +124,9 @@ struct ItemList: View {
 
     /// Fits Now, the label and up to `maxVisibleUpNextRows` rows, then the list scrolls.
     private var height: CGFloat {
-        guard !store.items.isEmpty else { return 0 }
-        let upNext = store.upNext.count
+        let count = store.items.count + (completing == nil ? 0 : 1)
+        guard count > 0 else { return 0 }
+        let upNext = count - 1
         let label = upNext > 0 ? Self.rowHeight : 0
         let rows = CGFloat(min(upNext, Self.maxVisibleUpNextRows)) * Self.rowHeight
         let hasMessage = store.items.contains { message(for: $0.id) != nil }
