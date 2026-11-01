@@ -80,7 +80,7 @@ Every push runs the format check and the unit tests on GitHub Actions. UI tests 
 
 ## Releasing
 
-Push a version tag, for example `git tag v1.0.1 && git push origin v1.0.1`. The Release workflow (`.github/workflows/release.yml`) runs the unit tests, builds a universal Release app, packages `Wedge-<version>.dmg` with an Applications shortcut, and publishes it on the Releases page with the notes from `docs/releases/v<version>.md` (or `docs/releases/template.md`). These builds are ad-hoc signed and not notarized, so first launch needs Open Anyway.
+Push a version tag without a leading "v", for example `git tag 1.0.1 && git push origin 1.0.1` (the `v1.0.0`–`v3.0.3` tags are pre-1.0 internal history). The Release workflow (`.github/workflows/release.yml`) runs the unit tests, builds a universal Release app, packages `Wedge-<version>.dmg` with an Applications shortcut, and publishes it on the Releases page with the notes from `docs/releases/v<version>.md` (or `docs/releases/template.md`). These builds are ad-hoc signed and not notarized, so first launch needs Open Anyway.
 
 Once there is a Developer ID, releases can be signed and notarized on a Mac. `scripts/release.sh <version>` (for example `scripts/release.sh 1.0.0`) archives, signs, notarizes, staples and zips the app into `build/release/<version>/` and prints the SHA-256 of the zip. It reads your Apple Developer team ID from `WEDGE_TEAM_ID` and the notarytool keychain profile name from `WEDGE_NOTARY_PROFILE`; no credentials are stored in the repo. Before publishing, work through [docs/release-checklist.md](docs/release-checklist.md) (performance budgets, manual acceptance and hands-on checks).
 

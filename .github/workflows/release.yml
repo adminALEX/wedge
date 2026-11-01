@@ -3,7 +3,8 @@ name: Release
 # Builds Wedge on a macOS 26 runner, packages a drag-to-install DMG and
 # publishes it as a GitHub Release.
 #
-# Trigger: push a version tag (git tag v1.0.0 && git push origin v1.0.0),
+# Trigger: push a version tag (git tag 1.0.0 && git push origin 1.0.0),
+# without a leading "v": v1.0.0–v3.0.3 are the pre-1.0 internal history tags.
 # or run it by hand from the Actions tab with a version number.
 #
 # The app is ad-hoc signed, not notarized: there is no Developer ID yet.
@@ -13,7 +14,7 @@ name: Release
 
 on:
   push:
-    tags: ["v*.*.*"]
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
   workflow_dispatch:
     inputs:
       version:
@@ -50,7 +51,7 @@ jobs:
             echo "::error::Version must look like 1.0.0 (got '$V')"; exit 1
           fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
-          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+          echo "tag=$V" >> "$GITHUB_OUTPUT"
 
       - name: Unit tests
         run: |
