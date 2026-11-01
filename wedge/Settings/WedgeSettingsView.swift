@@ -69,7 +69,7 @@ struct WedgeSettingsView: View {
             }
 
             Section {
-                KeyboardShortcuts.Recorder(WedgeCopy.togglePanelShortcut, name: .showWedge)
+                KeyboardShortcuts.Recorder(WedgeCopy.showWedgeShortcut, name: .showWedge)
                 KeyboardShortcuts.Recorder(WedgeCopy.doneShortcut, name: .markDone)
                 Button(WedgeCopy.resetToDefaults) {
                     KeyboardShortcuts.reset(.showWedge, .markDone)

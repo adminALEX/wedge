@@ -25,15 +25,15 @@ final class AppEnvironment {
             persister = FileWedgePersistence(directory: directory)
             defaults = .standard
             sound = DoneSoundPlayer()
-        case .uiTest:
-            directory = FileManager.default.temporaryDirectory.appending(path: "wedge.uitest")
-            persister = InMemoryWedgePersistence(
-                items: ["Draft Q4 launch email", "Review onboarding PR", "Book dentist"].map { WedgeItem(text: $0) }
-            )
-            guard let suite = UserDefaults(suiteName: "wedge.uitest") else {
-                fatalError("UserDefaults suite wedge.uitest is unavailable")
+        case .uiTest, .unitTest:
+            let name = mode == .uiTest ? "wedge.uitest" : "wedge.unittest"
+            directory = FileManager.default.temporaryDirectory.appending(path: name)
+            let seed = mode == .uiTest ? ["Draft Q4 launch email", "Review onboarding PR", "Book dentist"] : []
+            persister = InMemoryWedgePersistence(items: seed.map { WedgeItem(text: $0) })
+            guard let suite = UserDefaults(suiteName: name) else {
+                fatalError("UserDefaults suite \(name) is unavailable")
             }
-            suite.removePersistentDomain(forName: "wedge.uitest")
+            suite.removePersistentDomain(forName: name)
             defaults = suite
             sound = SilentSoundPlayer()
         }

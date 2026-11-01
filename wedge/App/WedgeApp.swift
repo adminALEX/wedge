@@ -18,22 +18,20 @@ struct WedgeApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let mode: LaunchMode
-    /// Built here, not at launch, so the Settings scene can read it before `applicationDidFinishLaunching`.
-    /// Construction is inert (no status item, hotkeys or sound); `start()` does that.
-    let environment: AppEnvironment
-
-    override init() {
-        let mode = LaunchMode.current()
-        self.mode = mode
-        environment = AppEnvironment(mode: mode)
-        super.init()
-    }
+    private let mode = LaunchMode.current()
+    /// Built on first use, so a duplicate launch (which exits before touching it) never loads the
+    /// list or builds the panel. Construction starts nothing: `start()` creates the status item,
+    /// hotkeys and sound.
+    lazy var environment = AppEnvironment(mode: mode)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if mode == .normal, activateRunningInstance() {
-            NSApp.terminate(nil)
+        switch mode {
+        case .unitTest:
+            return  // hosted unit tests must not start the app or defer to a real running copy
+        case .normal where handOffToRunningInstance():
             return
+        case .normal, .uiTest:
+            break
         }
         environment.start()
         if mode == .normal { LaunchAtLoginService.enableOnLaunch() }
@@ -45,13 +43,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
-    /// Activates another running copy of this app, if any; returns whether there was one.
-    private func activateRunningInstance() -> Bool {
+    /// If another copy of this app is running, asks Launch Services to reopen it (which shows its
+    /// panel via `applicationShouldHandleReopen`), quits this copy, and returns true.
+    private func handOffToRunningInstance() -> Bool {
         guard let bundleID = Bundle.main.bundleIdentifier else { return false }
         let me = ProcessInfo.processInfo.processIdentifier
-        let others = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
-            .filter { $0.processIdentifier != me }
-        others.first?.activate()
-        return !others.isEmpty
+        guard let other = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
+            .first(where: { $0.processIdentifier != me })
+        else { return false }
+        guard let url = other.bundleURL else {
+            other.activate()
+            NSApp.terminate(nil)
+            return true
+        }
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration()) { _, _ in
+            Task { @MainActor in NSApp.terminate(nil) }
+        }
+        return true
     }
 }

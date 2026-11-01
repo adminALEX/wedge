@@ -51,7 +51,7 @@ enum WedgeCopy {
 
     // Settings — keyboard
     static let keyboardShortcutsSection = "Keyboard shortcuts"
-    static let togglePanelShortcut = "Toggle panel"
+    static let showWedgeShortcut = "Show Wedge"
     static var doneShortcut: String { done }
     static let resetToDefaults = "Reset to defaults"
 }
