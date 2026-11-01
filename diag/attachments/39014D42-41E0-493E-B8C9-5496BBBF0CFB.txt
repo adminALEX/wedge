@@ -1,0 +1,195 @@
+Attributes: Other, 0xb56ba9400, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Element subtree:
+ →Other, 0xb56ba9400, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Path to element:
+ →Application, 0xb56ba8780, pid: 4791, title: 'wedge'
+  ↳Dialog, 0xb56ba8640, {{570.0, 36.0}, {320.0, 280.0}}
+   ↳Group, 0xb56ba8500, {{570.0, 36.0}, {320.0, 280.0}}
+    ↳Group, 0xb56ba8b40, {{582.0, 48.0}, {296.0, 256.0}}, label: 'Wedge', Keyboard Focused
+     ↳ScrollView, 0xb56baa940, {{582.0, 65.0}, {296.0, 176.0}}
+      ↳Outline, 0xb56ba88c0, {{581.0, 64.0}, {298.0, 178.0}}
+       ↳OutlineRow, 0xb56ba8c80, {{582.0, 185.0}, {296.0, 28.0}}
+        ↳Cell, 0xb56ba9540, {{582.0, 185.0}, {296.0, 28.0}}, Keyboard Focused
+         ↳Other, 0xb56ba9400, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Query chain:
+ →Find: Target Application 'com.xela.wedge'
+  Output: {
+    Application, 0xb56ba83c0, pid: 4791, title: 'wedge', Disabled
+  }
+  ↪︎Find: Descendants matching type Any
+    Output: {
+      Dialog, 0xb56ba8280, {{570.0, 36.0}, {320.0, 280.0}}, Disabled
+      MenuBar, 0xb56bab840, {{0.0, 0.0}, {1024.0, 30.0}}
+      TouchBar, 0xb56b9f5c0, {{80.0, 0.0}, {685.0, 30.0}}, Disabled
+      MenuBar, 0xb56b14000, {{653.0, 3.0}, {154.0, 24.0}}
+      Group, 0xb56ba9cc0, {{570.0, 36.0}, {320.0, 280.0}}, Disabled
+      MenuBarItem, 0xb56babd40, {{0.0, 30.0}, {0.0, 0.0}}, title: 'Apple'
+      MenuBarItem, 0xb56b3a300, {{0.0, 30.0}, {0.0, 0.0}}, title: 'wedge'
+      MenuBarItem, 0xb56ba4140, {{0.0, 30.0}, {0.0, 0.0}}, title: 'Edit'
+      MenuBarItem, 0xb56ba43c0, {{0.0, 30.0}, {0.0, 0.0}}, title: 'View'
+      MenuBarItem, 0xb56ba5400, {{0.0, 30.0}, {0.0, 0.0}}, title: 'Window'
+      MenuBarItem, 0xb56b9f700, {{0.0, 30.0}, {0.0, 0.0}}, title: 'Help'
+      PopUpButton, 0xb56b9f480, {{79.0, -1.0}, {74.0, 32.0}}, label: 'emoji & symbols'
+      DisclosureTriangle, 0xb56b9f340, {{320.0, 0.0}, {15.0, 30.0}}, title: 'Candidate Bar', value: 1, Disabled
+      Button, 0xb56b9f200, {{337.0, 0.0}, {141.5, 30.0}}, title: 'I', value: 0, Disabled
+      Button, 0xb56b9f0c0, {{480.5, 0.0}, {141.0, 30.0}}, title: 'I'm', value: 0, Disabled
+      Button, 0xb56b9ee40, {{623.5, 0.0}, {141.5, 30.0}}, title: 'We', value: 0, Disabled
+      StatusItem, 0xb56b14140, {{653.0, 3.0}, {154.0, 24.0}}, title: 'Draft Q4 launch email', label: 'Wedge, Now: Draft Q4 launch email', Selected
+      Group, 0xb56ba9b80, {{582.0, 48.0}, {296.0, 256.0}}, label: 'Wedge', Keyboard Focused
+      Menu, 0xb56babc00, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56b3be80, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56ba6e40, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56ba52c0, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56ba5040, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56b9f840, {{0.0, 768.0}, {0.0, 0.0}}
+      StaticText, 0xb56ba9a40, {{582.0, 48.0}, {22.0, 13.0}}, value: Now
+      ScrollView, 0xb56ba9180, {{582.0, 65.0}, {296.0, 176.0}}, Disabled
+      TextField, 0xb56baa440, {{591.0, 257.0}, {278.0, 18.0}}, identifier: 'addField', placeholderValue: 'Add to Up Next…', Keyboard Focused
+      StaticText, 0xb56babe80, {{582.0, 291.0}, {112.0, 13.0}}, value: ⌘↩ Done · ⌘, Setti...
+      MenuItem, 0xb56bab480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_aboutThisMacRequested:', title: 'About This Mac'
+      MenuItem, 0xb56babac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_systemInformationRequested:', title: 'System Information'
+      MenuItem, 0xb56bab980, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb567517c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_systemSettingsRequested:', title: 'System Settings…, 1 update'
+      MenuItem, 0xb56750dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_appStoreRequested:', title: 'App Store'
+      MenuItem, 0xb56750f00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56751040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentsRequested:', title: 'Recent Items'
+      MenuItem, 0xb56b3abc0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b3aa80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_forceQuitPanelRequested:', title: 'Force Quit…'
+      MenuItem, 0xb56b3b340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_forceQuitRequested:', title: 'Force Quit wedge'
+      MenuItem, 0xb56b3b200, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b3b5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_sleepRequested:', title: 'Sleep'
+      MenuItem, 0xb56b3b480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_restartRequested:', title: 'Restart…'
+      MenuItem, 0xb56b3bac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_restartNowRequested:', title: 'Restart'
+      MenuItem, 0xb56b3b980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_shutDownRequested:', title: 'Shut Down…'
+      MenuItem, 0xb56b3b840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_shutDownNowRequested:', title: 'Shut Down'
+      MenuItem, 0xb56b3bc00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b3a940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_lockScreenRequested:', title: 'Lock Screen'
+      MenuItem, 0xb56b3a800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_logOutRequested:', title: 'Log Out Anka…'
+      MenuItem, 0xb56b3a580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_logOutNowRequested:', title: 'Log Out Anka'
+      MenuItem, 0xb56b3a1c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb569d97c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'orderFrontStandardAboutPanel:', title: 'About Wedge'
+      MenuItem, 0xb56b13d40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b13ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Settings…'
+      MenuItem, 0xb56b12f80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b130c0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Services'
+      MenuItem, 0xb56ba5b80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56ba5a40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'hide:', title: 'Hide Wedge', Disabled
+      MenuItem, 0xb56ba5180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'hideOtherApplications:', title: 'Hide Others', Disabled
+      MenuItem, 0xb56ba7480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'unhideAllApplications:', title: 'Show All', Disabled
+      MenuItem, 0xb56ba6bc0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56ba4000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'terminate:', title: 'Quit Wedge'
+      MenuItem, 0xb56ba6d00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'undo:', title: 'Undo'
+      MenuItem, 0xb56ba6440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'redo:', title: 'Redo', Disabled
+      MenuItem, 0xb56ba6a80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56ba6940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'cut:', title: 'Cut', Disabled
+      MenuItem, 0xb56ba6800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'copy:', title: 'Copy', Disabled
+      MenuItem, 0xb56ba66c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'paste:', title: 'Paste', Disabled
+      MenuItem, 0xb56ba6580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'delete:', title: 'Delete', Disabled
+      MenuItem, 0xb56ba6080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectAll:', title: 'Select All'
+      MenuItem, 0xb56ba61c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56ba5e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_NSMenuItemAutoFillIdentifier', title: 'AutoFill'
+      MenuItem, 0xb56ba5900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'startDictation:', title: 'Start Dictation…'
+      MenuItem, 0xb56ba4280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'orderFrontCharacterPalette:', title: 'Emoji & Symbols'
+      MenuItem, 0xb56ba5540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleFullScreen:', title: 'Enter Full Screen', Disabled
+      MenuItem, 0xb56b9fac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performClose:', title: 'Close', Disabled
+      MenuItem, 0xb56b9c140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'closeAll:', title: 'Close All'
+      MenuItem, 0xb56b9c000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performMiniaturize:', title: 'Minimize', Disabled
+      MenuItem, 0xb56b9fc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'miniaturizeAll:', title: 'Minimize All'
+      MenuItem, 0xb56b9fd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performZoom:', title: 'Zoom', Disabled
+      MenuItem, 0xb56b9c280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'zoomAll:', title: 'Zoom All'
+      MenuItem, 0xb56b9c3c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomFill:', title: 'Fill', Disabled
+      MenuItem, 0xb56b9c500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomCenter:', title: 'Center'
+      MenuItem, 0xb56b9c640, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b9c780, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Move & Resize'
+      MenuItem, 0xb56b9e940, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Full Screen Tile', Disabled
+      MenuItem, 0xb56b9ea80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b9e440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_removeWindowFromStageManagerSet:', title: 'Remove Window from Set', Disabled
+      MenuItem, 0xb56b9ed00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b9ebc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'arrangeInFront:', title: 'Bring All to Front'
+      MenuItem, 0xb56b9fe80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'alternateArrangeInFront:', title: 'Arrange in Front'
+      MenuItem, 0xb56b9f980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'showHelp:', title: 'Wedge Help'
+      Outline, 0xb56ba9040, {{581.0, 64.0}, {298.0, 178.0}}
+      Menu, 0xb56751180, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56b13200, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56ba5f40, {{0.0, 768.0}, {0.0, 0.0}}
+      Menu, 0xb56b9c8c0, {{0.0, 768.0}, {0.0, 0.0}}
+      OutlineRow, 0xb56ba8000, {{582.0, 65.0}, {296.0, 36.0}}, Disabled
+      OutlineRow, 0xb56ba9680, {{582.0, 101.0}, {296.0, 28.0}}, Disabled
+      OutlineRow, 0xb56baa300, {{582.0, 129.0}, {296.0, 28.0}}, Disabled
+      OutlineRow, 0xb56ba9f40, {{582.0, 157.0}, {296.0, 28.0}}, Disabled
+      OutlineRow, 0xb56ba8a00, {{582.0, 185.0}, {296.0, 28.0}}, Selected, Disabled
+      OutlineRow, 0xb56baa800, {{582.0, 213.0}, {296.0, 28.0}}, Disabled
+      TableColumn, 0xb56baaa80, {{582.0, 65.0}, {296.0, 176.0}}, identifier: 'ListColumn', Disabled
+      MenuItem, 0xb567512c0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Applications', Disabled
+      MenuItem, 0xb56751400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Installer'
+      MenuItem, 0xb56751540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “Installer” in Finder'
+      MenuItem, 0xb56751680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'System Settings'
+      MenuItem, 0xb56750000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “System Settings” in Finder'
+      MenuItem, 0xb56750140, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b3bd40, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Documents', Disabled
+      MenuItem, 0xb56b3a440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'AnkaGuestAddons.pkg'
+      MenuItem, 0xb56b3b700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “AnkaGuestAddons.pkg” in Finder'
+      MenuItem, 0xb56b3b0c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b3ad00, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Servers', Disabled
+      MenuItem, 0xb56b3af80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Macintosh HD'
+      MenuItem, 0xb56b3a6c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b3ae40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_clearRecentItemsRequested:', title: 'Clear Menu'
+      MenuItem, 0xb56b13340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Activity Monitor'
+      MenuItem, 0xb56b135c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Allocations & Leaks'
+      MenuItem, 0xb56b13700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'File Activity'
+      MenuItem, 0xb56b13e80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'System Trace'
+      MenuItem, 0xb56b13c00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile Active Application'
+      MenuItem, 0xb56b13480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile App Under Mouse'
+      MenuItem, 0xb56b13980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile Entire System'
+      MenuItem, 0xb56b13840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Toggle Instruments Recording'
+      MenuItem, 0xb56ba5cc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_configureServicesMenu:', title: 'Services Settings…'
+      MenuItem, 0xb56ba6300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromContactsCommand:', title: 'Contact…'
+      MenuItem, 0xb56ba5680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromPasswordsCommand:', title: 'Passwords…'
+      MenuItem, 0xb56ba57c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromCreditCardsCommand:', title: 'Credit Card…'
+      MenuItem, 0xb56b9ca00, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Halves', Disabled
+      MenuItem, 0xb56b9cb40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeft:', title: 'Left'
+      MenuItem, 0xb56b9cc80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRight:', title: 'Right'
+      MenuItem, 0xb56b9cdc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTop:', title: 'Top'
+      MenuItem, 0xb56b9cf00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottom:', title: 'Bottom'
+      MenuItem, 0xb56b9d040, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b9d180, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Quarters', Disabled
+      MenuItem, 0xb56b9d2c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopLeft:', title: 'Top Left'
+      MenuItem, 0xb56b9e800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopRight:', title: 'Top Right'
+      MenuItem, 0xb56b9e6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomLeft:', title: 'Bottom Left'
+      MenuItem, 0xb56b9d400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomRight:', title: 'Bottom Right'
+      MenuItem, 0xb56b9d540, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b9d680, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Arrange', Disabled
+      MenuItem, 0xb56b9d7c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeftAndRight:', title: 'Left & Right'
+      MenuItem, 0xb56b9d900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeftThreeUp:', title: 'Left & Quarters'
+      MenuItem, 0xb56b9da40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRightAndLeft:', title: 'Right & Left'
+      MenuItem, 0xb56b9db80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRightThreeUp:', title: 'Right & Quarters'
+      MenuItem, 0xb56b9dcc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopAndBottom:', title: 'Top & Bottom'
+      MenuItem, 0xb56b9de00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopThreeUp:', title: 'Top & Quarters'
+      MenuItem, 0xb56b9df40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomAndTop:', title: 'Bottom & Top'
+      MenuItem, 0xb56b9e300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomThreeUp:', title: 'Bottom & Quarters'
+      MenuItem, 0xb56b9e1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomQuarters:', title: 'Quarters'
+      MenuItem, 0xb56b9e080, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuItem, 0xb56b9e580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomUntile:', title: 'Return to Previous Size', Disabled
+      Cell, 0xb56ba8140, {{582.0, 65.0}, {296.0, 36.0}}, Keyboard Focused
+      Cell, 0xb56ba97c0, {{582.0, 101.0}, {296.0, 28.0}}, Keyboard Focused
+      Cell, 0xb56baa580, {{582.0, 129.0}, {296.0, 28.0}}, Keyboard Focused
+      Cell, 0xb56ba9e00, {{582.0, 157.0}, {296.0, 28.0}}, Keyboard Focused
+      Cell, 0xb56baad00, {{582.0, 185.0}, {296.0, 28.0}}, Keyboard Focused, Selected
+      Cell, 0xb56baae40, {{582.0, 213.0}, {296.0, 28.0}}, Keyboard Focused
+      Group, 0xb56ba8dc0, {{594.0, 74.0}, {271.0, 19.0}}, identifier: 'nowHeader', label: '1 of 5, Draft Q4 launch email'
+      StaticText, 0xb56ba9900, {{594.0, 112.0}, {40.0, 13.0}}, value: Up Next
+      Other, 0xb56baa080, {{606.0, 135.0}, {259.0, 16.0}}, identifier: 'upNextRow-2', label: '2 of 5, Review onboarding PR'
+      Other, 0xb56baa1c0, {{606.0, 163.0}, {259.0, 16.0}}, identifier: 'upNextRow-3', label: '3 of 5, Book dentist'
+      Other, 0xb56baa6c0, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+      Other, 0xb56baabc0, {{606.0, 219.0}, {259.0, 16.0}}, identifier: 'upNextRow-5', label: '5 of 5, Write notes'
+      Button, 0xb56ba8f00, {{594.0, 74.0}, {19.0, 19.0}}, identifier: 'circle', label: 'Done, Draft Q4 launch email'
+      StaticText, 0xb56ba92c0, {{619.0, 74.0}, {246.0, 19.0}}, value: Now, Draft Q4 laun...
+    }
+    ↪︎Find: Elements matching predicate '"upNextRow-4" IN identifiers'
+      Output: {
+        Other, 0xb56baa6c0, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+      }
+      ↪︎Find: First Match
+        Output: {
+          Other, 0xb56baa6c0, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+        }
