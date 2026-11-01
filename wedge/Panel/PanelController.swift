@@ -64,6 +64,7 @@ final class PanelController {
             return
         }
         isVisible = true
+        NSApp.activate()
         panel.makeKeyAndOrderFront(nil)
         installOutsideClickMonitor()
     }
