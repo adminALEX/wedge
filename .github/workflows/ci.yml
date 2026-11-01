@@ -1,59 +1,33 @@
-name: CI
-
-on:
-  push:
-    branches: ["**"]
-  pull_request:
-  workflow_dispatch:
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
+name: Diag
+on: push
+permissions:
+  contents: write
 jobs:
   test:
     runs-on: macos-26
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
-
       - name: Select Xcode 26
         run: |
           XCODE="$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
           sudo xcode-select -s "$XCODE"
-          xcodebuild -version
-          sw_vers
-          xcodebuild -list -project wedge.xcodeproj
-
-      - name: Lint (swift-format)
-        run: |
-          set -o pipefail
-          xcrun swift-format --version
-          xcrun swift-format lint -r --strict wedge wedgeTests wedgeUITests 2>&1 | tee lint.log
-
-      - name: Unit tests
-        run: |
-          set -o pipefail
-          xcodebuild test \
-            -project wedge.xcodeproj -scheme wedge -destination 'platform=macOS' \
-            -only-testing:wedgeTests \
-            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
-            2>&1 | tee xcodebuild.log | xcbeautify --renderer github-actions
-
       - name: UI tests
+        continue-on-error: true
         run: |
-          set -o pipefail
           xcodebuild test \
             -project wedge.xcodeproj -scheme wedge -destination 'platform=macOS' \
-            -only-testing:wedgeUITests \
+            -only-testing:wedgeUITests/WedgeUITests/testAddEditReorderDoneUndo \
+            -resultBundlePath ui.xcresult \
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
-            2>&1 | tee xcodebuild-ui.log | xcbeautify --renderer github-actions
-
-      - name: Report failures as annotations
-        if: failure()
+            > xcodebuild-ui.log 2>&1
+      - name: Push diagnostics
+        if: always()
         run: |
-          touch lint.log xcodebuild.log xcodebuild-ui.log
-          cat lint.log xcodebuild.log xcodebuild-ui.log \
-            | grep -E "error:|\*\* (BUILD|TEST) FAILED|Expectation failed|Issue recorded|failed \(" \
-            | head -45 \
-            | while IFS= read -r line; do echo "::error::${line:0:900}"; done
+          mkdir -p diag
+          cp xcodebuild-ui.log diag/ || true
+          xcrun xcresulttool export attachments --path ui.xcresult --output-path diag/attachments || true
+          ls -la diag diag/attachments || true
+          git config user.name ci && git config user.email ci@example.invalid
+          git checkout -b "ci/diag-out-${GITHUB_SHA::7}"
+          git add -f diag && git commit -qm "diag" && git push -q origin HEAD

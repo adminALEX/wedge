@@ -20,7 +20,9 @@ final class WedgeUITests: XCTestCase {
         expect(row("upNextRow-4", in: app), labelContains: "Write release notes")
 
         // 2. Click the row's title to edit it in place; ↩ saves.
+        snapshot(app, "before-click")
         row("upNextRow-4", in: app).click()
+        snapshot(app, "after-click")
         app.typeKey(.rightArrow, modifierFlags: .command)  // to the end of the text
         app.typeKey(.delete, modifierFlags: .command)  // delete to the start of the line
         app.typeText("Write notes")
@@ -57,6 +59,18 @@ final class WedgeUITests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    @MainActor
+    private func snapshot(_ app: XCUIApplication, _ name: String) {
+        let tree = XCTAttachment(string: app.debugDescription)
+        tree.name = name + "-tree"
+        tree.lifetime = .keepAlways
+        add(tree)
+        let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        shot.name = name + "-screen"
+        shot.lifetime = .keepAlways
+        add(shot)
+    }
 
     @MainActor
     private func launchWithPanel() -> XCUIApplication {
