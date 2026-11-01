@@ -74,7 +74,6 @@ struct PanelView: View {
         .fixedSize(horizontal: false, vertical: true)
         .glassEffect(.regular, in: .rect(cornerRadius: 20))
         .background { shortcuts }
-        .defaultFocus($focus, .add)
         .onChange(of: panel.isVisible) { _, isVisible in
             guard isVisible else { return }
             // Any Done so far happened while the panel was hidden: it never plays (R19).
