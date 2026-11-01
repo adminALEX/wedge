@@ -53,8 +53,8 @@ final class DoneAction {
 
     static func announcement(for event: DoneEvent) -> String {
         if let next = event.next {
-            return "Done. Now: \(next.text)"
+            return WedgeCopy.doneNowAnnouncement(next.text)
         }
-        return "Done. Nothing up next."
+        return WedgeCopy.doneNothingUpNextAnnouncement
     }
 }
