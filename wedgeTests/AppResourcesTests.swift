@@ -28,6 +28,7 @@ struct AppResourcesTests {
         #expect(reasons == [
             "NSPrivacyAccessedAPICategoryUserDefaults": ["CA92.1"],
             "NSPrivacyAccessedAPICategoryFileTimestamp": ["C617.1"],
+            "NSPrivacyAccessedAPICategorySystemBootTime": ["35F9.1"],
         ])
     }
 }
