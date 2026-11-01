@@ -34,6 +34,15 @@ enum WedgeCopy {
         }
     }
 
+    // Shortcuts, Spotlight and Siri
+    static let addToUpNextTitle = "Add to Up Next"
+    static let markDoneTitle = "Mark Done"
+    static let getNowTitle = "Get Now"
+    static let textParameterTitle = "Text"
+    static let addedToUpNext = "Added to Up Next."
+    static let nothingToMarkDone = "Nothing to mark done."
+    static func nowIs(_ text: String) -> String { "\(now): \(text)" }
+
     // Panel — store issues
     static let saveFailed = "Couldn't save. Your latest changes may be lost."
     static let recoveredFromCorruptFile = "Couldn't read your list. A copy was saved in Application Support."
