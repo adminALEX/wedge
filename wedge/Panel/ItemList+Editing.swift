@@ -9,6 +9,9 @@ extension ItemList {
         refused = false
         selection = id
         edit = RowEdit(id: id, text: item.text)
+        // Focus in the same update that inserts the field: set only from the field's onAppear,
+        // it never took inside the List, so the field showed without a caret.
+        focus.wrappedValue = .row(id)
     }
 
     /// Saves the edit when its normalized text differs; a rejected edit keeps the old text and shows why.

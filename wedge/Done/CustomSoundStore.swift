@@ -15,10 +15,6 @@ struct CustomSoundStore {
 
     let directory: URL
 
-    init(directory: URL) {
-        self.directory = directory
-    }
-
     /// Validates `source`, replaces any previous custom file, and returns the new file name.
     func install(from source: URL) async throws -> String {
         let ext = source.pathExtension.lowercased()
