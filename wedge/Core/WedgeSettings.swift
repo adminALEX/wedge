@@ -41,7 +41,7 @@ final class WedgeSettings {
 
     private static func read(_ key: String, in defaults: UserDefaults) -> String? {
         guard let value = defaults.string(forKey: key)?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !value.isEmpty
+            !value.isEmpty
         else { return nil }
         return value
     }

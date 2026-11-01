@@ -1,7 +1,7 @@
 import AppKit
-import os
 import SwiftUI
 import UniformTypeIdentifiers
+import os
 
 /// The Done sound row: current name, Preview, Choose…, and Use Default once a custom file is set.
 /// A failed choice shows its message under the row and clears on the next success.

@@ -1,6 +1,7 @@
 import AppKit
 import QuartzCore
 import Testing
+
 @testable import wedge
 
 @Suite("StatusItemBump")

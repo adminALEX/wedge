@@ -1,7 +1,7 @@
 import Foundation
 import Observation
-import os
 import SwiftUI
+import os
 
 enum StoreIssue: Equatable {
     case saveFailed
@@ -104,7 +104,8 @@ final class WedgeStore {
 
     /// Collapses newline/tab runs to one space, trims, then enforces 1...40 characters.
     static func normalized(_ text: String) throws -> String {
-        let collapsed = text
+        let collapsed =
+            text
             .split(whereSeparator: { $0.isNewline || $0 == "\t" })
             .joined(separator: " ")
             .trimmingCharacters(in: .whitespacesAndNewlines)

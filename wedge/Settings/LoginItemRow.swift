@@ -1,7 +1,7 @@
 import AppKit
-import os
 import ServiceManagement
 import SwiftUI
+import os
 
 /// The Open at login toggle. When macOS wants the user's approval, or a change fails,
 /// the Login Items message appears under it (with a button to System Settings when approval is pending).

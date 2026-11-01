@@ -138,7 +138,8 @@ final class StatusItemController: NSObject {
         menu.addItem(.separator())
         menu.addItem(menuItem(WedgeCopy.settingsMenu, #selector(menuSettings), key: ","))
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: WedgeCopy.quitMenu, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(
+            NSMenuItem(title: WedgeCopy.quitMenu, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem?.menu = menu
         statusItem?.button?.performClick(nil)
         statusItem?.menu = nil

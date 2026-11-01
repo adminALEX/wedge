@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import wedge
 
 /// A store over in-memory persistence, pre-filled with items of the given texts.

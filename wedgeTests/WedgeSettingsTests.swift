@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import Observation
 import Testing
+
 @testable import wedge
 
 /// Lets the `@Sendable` observation callback record that it ran.

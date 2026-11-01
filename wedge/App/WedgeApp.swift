@@ -1,7 +1,7 @@
 import AppIntents
 import AppKit
-import os
 import SwiftUI
+import os
 
 @main
 struct WedgeApp: App {
@@ -70,8 +70,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func handOffToRunningInstance() -> Bool {
         guard let bundleID = Bundle.main.bundleIdentifier else { return false }
         let me = ProcessInfo.processInfo.processIdentifier
-        guard let other = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
-            .first(where: { $0.processIdentifier != me })
+        guard
+            let other = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
+                .first(where: { $0.processIdentifier != me })
         else { return false }
         guard let url = other.bundleURL else {
             other.activate()

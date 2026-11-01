@@ -1,7 +1,7 @@
 import AppKit
 import Observation
-import os
 import SwiftUI
+import os
 
 /// Owns the panel and its hosting view (both created once) and positions it under the status item,
 /// sized to the content's height (and resized while open as the content grows or shrinks).
@@ -41,7 +41,9 @@ final class PanelController {
                         }
                     }
                 }
-                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { [weak self] height in
+                .onGeometryChange(for: CGFloat.self) {
+                    $0.size.height
+                } action: { [weak self] height in
                     self?.contentHeightChanged(to: height)
                 }
                 .environment(self)

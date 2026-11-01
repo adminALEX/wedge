@@ -25,12 +25,12 @@ enum TestAudioFixtures {
         appendASCII("WAVE")
         appendASCII("fmt ")
         appendUInt32(16)
-        appendUInt16(1) // PCM
-        appendUInt16(1) // mono
+        appendUInt16(1)  // PCM
+        appendUInt16(1)  // mono
         appendUInt32(UInt32(sampleRate))
         appendUInt32(UInt32(sampleRate * 2))
-        appendUInt16(2) // block align
-        appendUInt16(16) // bits
+        appendUInt16(2)  // block align
+        appendUInt16(16)  // bits
         appendASCII("data")
         appendUInt32(UInt32(dataSize))
         data.append(Data(count: dataSize))

@@ -81,6 +81,7 @@ final class WedgeUITests: XCTestCase {
         let result = XCTWaiter().wait(
             for: [XCTNSPredicateExpectation(predicate: matches, object: element)], timeout: Self.timeout)
         let found = element.exists ? "label \"\(element.label)\"" : "no such element"
-        XCTAssertEqual(result, .completed, "Expected a label containing \"\(text)\"; found \(found)", file: file, line: line)
+        XCTAssertEqual(
+            result, .completed, "Expected a label containing \"\(text)\"; found \(found)", file: file, line: line)
     }
 }

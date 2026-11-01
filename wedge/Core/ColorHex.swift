@@ -7,7 +7,7 @@ extension NSColor {
         guard trimmed.hasPrefix("#") else { return nil }
         let digits = trimmed.dropFirst()
         guard digits.count == 6, digits.allSatisfy(\.isHexDigit),
-              let value = UInt32(digits, radix: 16)
+            let value = UInt32(digits, radix: 16)
         else { return nil }
         self.init(
             srgbRed: CGFloat((value >> 16) & 0xFF) / 255,

@@ -21,7 +21,8 @@ struct ItemListKeys: ViewModifier {
                     return .handled
                 }
                 if delta == 1, press.modifiers.isDisjoint(with: [.command, .option, .control, .shift]),
-                    list.selection != nil, list.selection == list.store.items.last?.id {
+                    list.selection != nil, list.selection == list.store.items.last?.id
+                {
                     list.onLeaveBottom()
                     return .handled
                 }
