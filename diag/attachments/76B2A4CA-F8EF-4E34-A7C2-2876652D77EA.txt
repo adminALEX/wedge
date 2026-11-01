@@ -1,0 +1,37 @@
+Attributes: Group, 0x87f8b2f80, {{inf, inf}, {0.0, 0.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Element subtree:
+ →Group, 0x87f8b2f80, {{inf, inf}, {0.0, 0.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Path to element:
+ →Any, 0x87f8b1180, {{inf, inf}, {0.0, 0.0}}
+  ↳Any, 0x87f8b1a40, {{inf, inf}, {0.0, 0.0}}
+   ↳Any, 0x87f8b0280, {{inf, inf}, {0.0, 0.0}}
+    ↳Group, 0x87f8b1040, {{inf, inf}, {0.0, 0.0}}, label: 'Wedge'
+     ↳Any, 0x87f8b1400, {{inf, inf}, {0.0, 0.0}}
+      ↳Any, 0x87f8b2bc0, {{inf, inf}, {0.0, 0.0}}
+       ↳Any, 0x87f8b2a80, {{inf, inf}, {0.0, 0.0}}
+        ↳Any, 0x87f8b03c0, {{inf, inf}, {0.0, 0.0}}
+         ↳Group, 0x87f8b2f80, {{inf, inf}, {0.0, 0.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Query chain:
+ →Find: Target Application 'com.xela.wedge'
+  Output: {
+    Any, 0x87f8b1180, {{inf, inf}, {0.0, 0.0}}
+  }
+  ↪︎Find: Descendants matching type Any
+    Output: {
+      Any, 0x87f8b1a40, {{inf, inf}, {0.0, 0.0}}
+      Any, 0x87f8b0280, {{inf, inf}, {0.0, 0.0}}
+      Group, 0x87f8b1040, {{inf, inf}, {0.0, 0.0}}, label: 'Wedge'
+      Any, 0x87f8b1400, {{inf, inf}, {0.0, 0.0}}
+      Any, 0x87f8b2bc0, {{inf, inf}, {0.0, 0.0}}
+      Any, 0x87f8b2a80, {{inf, inf}, {0.0, 0.0}}
+      Any, 0x87f8b03c0, {{inf, inf}, {0.0, 0.0}}
+      Group, 0x87f8b2f80, {{inf, inf}, {0.0, 0.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+    }
+    ↪︎Find: Elements matching predicate '"upNextRow-4" IN identifiers'
+      Output: {
+        Group, 0x87f8b2f80, {{inf, inf}, {0.0, 0.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+      }
+      ↪︎Find: First Match
+        Output: {
+          Group, 0x87f8b2f80, {{inf, inf}, {0.0, 0.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+        }
