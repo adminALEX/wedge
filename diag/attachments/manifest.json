@@ -1,0 +1,44 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "327a3f77318cba5bb38c3dad94dde968b98f3d62",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "18B15499-FDA1-4C94-8A55-3C6683FDAABF.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "after-click-screen_0_78C781A0-C1E9-4164-8710-3D1924E32ED7.png",
+        "timestamp" : 1793556678.747
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "327a3f77318cba5bb38c3dad94dde968b98f3d62",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "ABAA1EE5-84D0-420D-83ED-9EF9690C0654.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "after-click-tree_0_3D16E76A-FBEF-4A1C-B2CD-BF11DDC93877.txt",
+        "timestamp" : 1793556678.716
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "327a3f77318cba5bb38c3dad94dde968b98f3d62",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8A0E0FC0-48E3-494B-828E-88A4F964B827.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "before-click-screen_0_B0F750CF-99FE-4D71-A933-58707DDE98BA.png",
+        "timestamp" : 1793556677.521
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "327a3f77318cba5bb38c3dad94dde968b98f3d62",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "E377908C-7949-4C1D-A969-2EE24A9EE267.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "before-click-tree_0_70A1A7CD-BF41-4BEF-913E-2A6677C5C0A9.txt",
+        "timestamp" : 1793556677.433
+      }
+    ],
+    "testIdentifier" : "WedgeUITests/testAddEditReorderDoneUndo()",
+    "testIdentifierURL" : "test://com.apple.xcode/wedge/wedgeUITests/WedgeUITests/testAddEditReorderDoneUndo"
+  }
+]
