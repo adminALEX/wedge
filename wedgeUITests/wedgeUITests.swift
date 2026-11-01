@@ -21,7 +21,9 @@ final class WedgeUITests: XCTestCase {
 
         // 2. Click the row's title to edit it in place; ↩ saves.
         snapshot(app, "before-click")
-        row("upNextRow-4", in: app).click()
+        app.typeKey(.upArrow, modifierFlags: [])
+        snapshot(app, "after-up")
+        app.typeKey(.return, modifierFlags: [])
         snapshot(app, "after-click")
         app.typeKey(.rightArrow, modifierFlags: .command)  // to the end of the text
         app.typeKey(.delete, modifierFlags: .command)  // delete to the start of the line
