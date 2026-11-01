@@ -40,7 +40,7 @@ final class StatusItemController: NSObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            Task { @MainActor [weak self] in
                 self?.refreshTitle()
             }
         }
@@ -50,7 +50,7 @@ final class StatusItemController: NSObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
+            Task { @MainActor [weak self] in
                 self?.restoreAccessoryPolicyIfIdle()
             }
         }
