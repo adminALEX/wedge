@@ -25,6 +25,7 @@ struct AddField: View {
                 )
                 .textFieldStyle(.plain)
                 .focused(focus, equals: .add)
+                .accessibilityIdentifier(AccessibilityID.addField)
                 .inputLimit($draft, refused: $refused)
                 .onSubmit { submit() }
                 .onKeyPress(.upArrow) {

@@ -15,4 +15,10 @@ enum LaunchMode: Equatable {
         if args.contains("-WedgeUITest") { return .uiTest }
         return environment["XCTestConfigurationFilePath"] != nil ? .unitTest : .normal
     }
+
+    /// UI tests add `-WedgeUITestShowPanel` to start with the panel open, so they need not click
+    /// the menu-bar item. Ignored outside `.uiTest`.
+    static func showsPanelAtStart(_ mode: LaunchMode, args: [String] = CommandLine.arguments) -> Bool {
+        mode == .uiTest && args.contains("-WedgeUITestShowPanel")
+    }
 }

@@ -116,6 +116,7 @@ struct ItemList: View {
         // The Now row keeps its ring and title reachable; other rows read as one element.
         .accessibilityElement(children: isNow || isEditing ? .contain : .ignore)
         .accessibilityLabel(WedgeCopy.rowAccessibility(position, of: store.items.count, item.text))
+        .accessibilityIdentifier(isNow ? AccessibilityID.nowHeader : AccessibilityID.upNextRow(position))
         .accessibilityAction(named: WedgeCopy.moveUp) { move(item.id, by: -1) }
         .accessibilityAction(named: WedgeCopy.moveDown) { move(item.id, by: 1) }
         .contextMenu {

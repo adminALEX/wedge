@@ -15,6 +15,7 @@ final class AppEnvironment {
     let panel: PanelController
     let statusItem: StatusItemController
     let hotkeys: HotkeyController
+    private let showsPanelAtStart: Bool
 
     init(mode: LaunchMode) {
         let persister: any WedgePersisting
@@ -56,6 +57,7 @@ final class AppEnvironment {
         self.soundStore = CustomSoundStore(directory: directory)
         self.panel = panel
         self.hotkeys = hotkeys
+        self.showsPanelAtStart = LaunchMode.showsPanelAtStart(mode)
         self.statusItem = StatusItemController(
             store: store, settings: settings, doneAction: doneAction, panel: panel, hotkeys: hotkeys
         )
@@ -65,6 +67,7 @@ final class AppEnvironment {
         loadSoundAndObserve()
         hotkeys.start()
         statusItem.start()
+        if showsPanelAtStart { panel.show() }
     }
 
     /// Loads the chosen sound now and again whenever the custom file changes; re-armed after each change.

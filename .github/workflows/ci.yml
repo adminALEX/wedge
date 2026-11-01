@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Select Xcode 26
         run: |
@@ -24,6 +24,12 @@ jobs:
           xcodebuild -version
           sw_vers
           xcodebuild -list -project wedge.xcodeproj
+
+      - name: Lint (swift-format)
+        run: |
+          set -o pipefail
+          xcrun swift-format --version
+          xcrun swift-format lint -r --strict wedge wedgeTests wedgeUITests 2>&1 | tee lint.log
 
       - name: Unit tests
         run: |
@@ -34,10 +40,20 @@ jobs:
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             2>&1 | tee xcodebuild.log | xcbeautify --renderer github-actions
 
+      - name: UI tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project wedge.xcodeproj -scheme wedge -destination 'platform=macOS' \
+            -only-testing:wedgeUITests \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            2>&1 | tee xcodebuild-ui.log | xcbeautify --renderer github-actions
+
       - name: Report failures as annotations
         if: failure()
         run: |
-          touch xcodebuild.log
-          grep -E "error:|\*\* (BUILD|TEST) FAILED|Expectation failed|Issue recorded|failed \(" xcodebuild.log \
+          touch lint.log xcodebuild.log xcodebuild-ui.log
+          cat lint.log xcodebuild.log xcodebuild-ui.log \
+            | grep -E "error:|\*\* (BUILD|TEST) FAILED|Expectation failed|Issue recorded|failed \(" \
             | head -45 \
             | while IFS= read -r line; do echo "::error::${line:0:900}"; done
