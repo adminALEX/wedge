@@ -1,5 +1,6 @@
 import AppKit
 import KeyboardShortcuts
+import Observation
 import SwiftUI
 
 extension Notification.Name {
@@ -10,17 +11,20 @@ extension Notification.Name {
 @MainActor
 final class StatusItemController: NSObject {
     private let store: WedgeStore
+    private let settings: WedgeSettings
     private var statusItem: NSStatusItem?
     /// Floating panel (not a transient popover) so text editing stays usable.
     private var panel: NSPanel?
-    private let popSound = PopSoundPlayer()
+    private let popSound: PopSoundPlayer
     /// After ⌥-click Done on mouseDown, ignore the matching mouseUp so the panel doesn't open.
     private var suppressNextLeftMouseUp = false
 
     private static let panelSize = NSSize(width: 300, height: 340)
 
-    init(store: WedgeStore) {
+    init(store: WedgeStore, settings: WedgeSettings, soundStore: CustomSoundStore) {
         self.store = store
+        self.settings = settings
+        self.popSound = PopSoundPlayer(settings: settings, soundStore: soundStore)
     }
 
     func start() {
@@ -33,15 +37,7 @@ final class StatusItemController: NSObject {
         }
         statusItem = item
         refreshTitle()
-        NotificationCenter.default.addObserver(
-            forName: .wedgeMenuBarAppearanceDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.refreshTitle()
-            }
-        }
+        observeAppearance()
         // After Settings (or panel) closes, return to menu-bar-only if nothing is open.
         NotificationCenter.default.addObserver(
             forName: NSWindow.willCloseNotification,
@@ -95,6 +91,30 @@ final class StatusItemController: NSObject {
             .contains(.option)
     }
 
+    /// Refreshes the title when bold or color change; re-armed after each change.
+    private func observeAppearance() {
+        withObservationTracking {
+            _ = settings.isBold
+            _ = settings.customColorHex
+        } onChange: { [weak self] in
+            // onChange runs before the new value lands; hop a turn so refresh sees it.
+            Task { @MainActor [weak self] in
+                self?.refreshTitle()
+                self?.observeAppearance()
+            }
+        }
+    }
+
+    private var titleColor: NSColor {
+        settings.customColorHex.flatMap { NSColor(hex: $0) } ?? .labelColor
+    }
+
+    private var titleFont: NSFont {
+        settings.isBold
+            ? NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
+            : NSFont.menuBarFont(ofSize: 0)
+    }
+
     func refreshTitle() {
         guard let button = statusItem?.button else { return }
         if let text = store.now?.text {
@@ -103,8 +123,8 @@ final class StatusItemController: NSObject {
             button.attributedTitle = NSAttributedString(
                 string: text,
                 attributes: [
-                    .foregroundColor: MenuBarAppearance.titleColor,
-                    .font: MenuBarAppearance.titleFont
+                    .foregroundColor: titleColor,
+                    .font: titleFont
                 ]
             )
         } else {

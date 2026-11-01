@@ -1,32 +1,22 @@
 import AppKit
+import Observation
 
 /// Plays the Done confirmation sound (bundled default or custom).
 @MainActor
 final class PopSoundPlayer {
+    private let settings: WedgeSettings
+    private let soundStore: CustomSoundStore
     private var sound: NSSound?
-    nonisolated(unsafe) private var observer: NSObjectProtocol?
 
-    init() {
+    init(settings: WedgeSettings, soundStore: CustomSoundStore) {
+        self.settings = settings
+        self.soundStore = soundStore
         reload()
-        observer = NotificationCenter.default.addObserver(
-            forName: .wedgePopSoundPreferencesDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.reload()
-            }
-        }
-    }
-
-    deinit {
-        if let observer {
-            NotificationCenter.default.removeObserver(observer)
-        }
+        observeCustomSound()
     }
 
     func play() {
-        guard PopSoundPreferences.isEnabled() else { return }
+        guard settings.playsSound else { return }
         guard let sound else {
             NSSound.beep()
             return
@@ -39,10 +29,23 @@ final class PopSoundPlayer {
 
     func reload() {
         sound?.stop()
-        if let custom = PopSoundPreferences.customSoundURL() {
+        if let custom = soundStore.url(for: settings.customSoundFileName) {
             sound = NSSound(contentsOf: custom, byReference: false)
         } else {
             sound = Self.loadBundledSound()
+        }
+    }
+
+    /// Reloads whenever the chosen custom file changes; re-armed after each change.
+    private func observeCustomSound() {
+        withObservationTracking {
+            _ = settings.customSoundFileName
+        } onChange: { [weak self] in
+            // onChange runs before the new value lands; hop a turn so reload sees it.
+            Task { @MainActor [weak self] in
+                self?.reload()
+                self?.observeCustomSound()
+            }
         }
     }
 

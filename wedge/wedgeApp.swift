@@ -15,7 +15,7 @@ struct wedgeApp: App {
     var body: some Scene {
         // Native Settings scene — system installs Settings… with ⌘, in the app menu.
         Settings {
-            WedgeSettingsView()
+            WedgeSettingsView(settings: appDelegate.settings, soundStore: appDelegate.soundStore)
         }
     }
 }
@@ -26,11 +26,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let store = WedgeStore(
         persister: FileWedgePersistence(directory: FileWedgePersistence.defaultDirectory())
     )
+    let settings = WedgeSettings(defaults: .standard)
+    let soundStore = CustomSoundStore(directory: FileWedgePersistence.defaultDirectory())
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         LaunchAtLoginService.enableOnLaunch()
-        let controller = StatusItemController(store: store)
+        let controller = StatusItemController(store: store, settings: settings, soundStore: soundStore)
         controller.start()
         statusItemController = controller
     }
