@@ -7,8 +7,8 @@
 | `swiftui-expert-skill` | SwiftUI / macOS UI |
 | `swift-testing-expert` | Tests |
 | `swift-concurrency` | Concurrency / `@Observable` |
-| `writing-plans` | Bite-sized implementation plans (phase tasks) |
-| `roadmap-update` | Product roadmap / phase-by-phase scope |
+| `writing-plans` | Bite-sized implementation plans |
+| `roadmap-update` | Product roadmap and scope |
 | `docs-updater` | Sync docs after landed changes |
 | `wedge-keep-aligned` | Keep rules + plans + docs consistent after confirmations |
 
@@ -16,7 +16,7 @@ Canonical copies live in `.agents/skills/`; Cursor sees them via `.cursor/skills
 
 ## Rules
 
-- `wedge-product.mdc` — v1 path, language, horizon v1–v3
+- `wedge-product.mdc` — Wedge 1.0 product rules, language, behaviour, "Focused by default"
 - `macos-menubar.mdc` — menu-bar Swift conventions
 - `docs-plans-align.mdc` — when to update plans/docs/rules
 - `find-skills-first.mdc` — always search find-skills for request-relevant skills
@@ -25,7 +25,7 @@ Canonical copies live in `.agents/skills/`; Cursor sees them via `.cursor/skills
 
 - `docs/product/overview.md`
 - `docs/product/roadmap.md`
-- `docs/product/phases/v1.md` · `v2.md` · `v3.md`
+- `docs/product/history/v1.md` · `v2.md` · `v3.md` — archive of earlier phases, not updated
 
 ## Hooks
 
