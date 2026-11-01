@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import os
 
 /// Plays the Done confirmation sound. Never beeps: a missing or unplayable sound is silent.
 protocol DoneSoundPlaying: AnyObject {
