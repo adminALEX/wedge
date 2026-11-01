@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import os
 import SwiftUI
 
 /// Owns the panel and its hosting view (both created once) and positions it under the status item.
