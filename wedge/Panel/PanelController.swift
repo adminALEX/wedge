@@ -12,10 +12,14 @@ final class PanelController {
     @ObservationIgnored var itemFrameProvider: () -> (frame: CGRect, screen: NSScreen)? = { nil }
 
     /// Activates Wedge and opens Settings. Live once the hosted `SettingsOpener` has appeared.
-    @ObservationIgnored private(set) var openSettings: () -> Void = {}
+    @ObservationIgnored private(set) var openSettings: () -> Void = {
+        Log.panel.error("Settings opener not ready")
+    }
 
     @ObservationIgnored private let panel = WedgePanel()
     @ObservationIgnored private let hostingView = NSHostingView(rootView: AnyView(EmptyView()))
+    /// Present only while the panel is visible: a click in another app or menu-bar extra hides it.
+    @ObservationIgnored private var outsideClickMonitor: Any?
     @ObservationIgnored private var lastHiddenAt: TimeInterval = -.infinity
 
     init<Content: View>(content: Content) {
@@ -56,13 +60,33 @@ final class PanelController {
         )
         isVisible = true
         panel.makeKeyAndOrderFront(nil)
+        installOutsideClickMonitor()
     }
 
     func hide() {
         guard isVisible else { return }
         isVisible = false
         lastHiddenAt = ProcessInfo.processInfo.systemUptime
+        removeOutsideClickMonitor()
         panel.orderOut(nil)
+    }
+
+    /// Clicks on other apps' windows or menu-bar extras don't always take key from the panel,
+    /// so resignKey alone can leave it open. Global monitors never see events delivered to
+    /// Wedge itself (the panel, the status item), and a hide caused by one of these clicks is
+    /// at or after the event's timestamp, so `wasVisible(atEventTimestamp:)` still holds.
+    private func installOutsideClickMonitor() {
+        removeOutsideClickMonitor()
+        outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in self?.hide() }
+        }
+    }
+
+    private func removeOutsideClickMonitor() {
+        if let outsideClickMonitor { NSEvent.removeMonitor(outsideClickMonitor) }
+        outsideClickMonitor = nil
     }
 
     /// Whether the panel was showing when the event with this timestamp (`NSEvent.timestamp`) happened.
