@@ -58,7 +58,7 @@ final class FileWedgePersistence: WedgePersisting {
 
     /// Moves the unreadable file aside so the next save cannot overwrite it.
     private func backUpCorruptFile(underlying: Error) throws -> WedgePersistenceError {
-        Log.store.error("wedge.json is unreadable: \(String(describing: underlying), privacy: .public)")
+        Log.store.error("wedge.json is unreadable: \(String(describing: underlying), privacy: .private)")
         let backup = uniqueBackupURL()
         try FileManager.default.moveItem(at: fileURL, to: backup)
         return .corrupt(backup: backup)

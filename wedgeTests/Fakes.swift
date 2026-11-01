@@ -11,11 +11,12 @@ func store(_ texts: [String]) -> WedgeStore {
 @MainActor
 final class FailingLoadPersistence: WedgePersisting {
     let error: Error
+    private(set) var saveCount = 0
 
     init(error: Error) {
         self.error = error
     }
 
     func load() throws -> [WedgeItem] { throw error }
-    func save(_ items: [WedgeItem]) throws {}
+    func save(_ items: [WedgeItem]) throws { saveCount += 1 }
 }

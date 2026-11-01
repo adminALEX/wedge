@@ -6,6 +6,9 @@ import SwiftUI
 enum StoreIssue: Equatable {
     case saveFailed
     case recoveredFromCorruptFile
+    /// The file could not be read for a reason other than corruption (for example a newer
+    /// file version). Saving is disabled for the rest of the run so the file is not overwritten.
+    case loadFailed
 }
 
 enum WedgeStoreError: Error, Equatable {
@@ -39,8 +42,9 @@ final class WedgeStore {
             items = []
             issue = .recoveredFromCorruptFile
         } catch {
-            Log.store.error("Could not load items: \(String(describing: error), privacy: .public)")
+            Log.store.error("Could not load items; saving disabled: \(String(describing: error), privacy: .private)")
             items = []
+            issue = .loadFailed
         }
     }
 
@@ -111,14 +115,15 @@ final class WedgeStore {
         return collapsed
     }
 
-    /// Saves after a mutation and updates `issue`. Clears the Done undo slot unless told otherwise.
+    /// Saves after a mutation and updates `issue` (no-op save after `.loadFailed`). Clears the Done undo slot unless told otherwise.
     private func commit(keepingUndo: Bool = false) {
         if !keepingUndo { lastDone = nil }
+        guard issue != .loadFailed else { return }
         do {
             try persister.save(items)
-            if issue == .saveFailed { issue = nil }
+            if issue == .saveFailed || issue == .recoveredFromCorruptFile { issue = nil }
         } catch {
-            Log.store.error("Save failed: \(String(describing: error), privacy: .public)")
+            Log.store.error("Save failed: \(String(describing: error), privacy: .private)")
             issue = .saveFailed
         }
     }

@@ -16,6 +16,8 @@ enum WedgePersistenceError: Error, Equatable {
 final class InMemoryWedgePersistence: WedgePersisting {
     var items: [WedgeItem]
     var failSaves = false
+    /// Number of `save` calls, including failed ones.
+    private(set) var saveCount = 0
 
     init(items: [WedgeItem] = []) {
         self.items = items
@@ -24,6 +26,7 @@ final class InMemoryWedgePersistence: WedgePersisting {
     func load() throws -> [WedgeItem] { items }
 
     func save(_ items: [WedgeItem]) throws {
+        saveCount += 1
         if failSaves { throw CocoaError(.fileWriteUnknown) }
         self.items = items
     }

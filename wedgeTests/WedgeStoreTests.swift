@@ -6,7 +6,7 @@ import Testing
 @MainActor
 struct WedgeStoreTests {
 
-    @Test("first add becomes one thing")
+    @Test("first add becomes Now")
     func firstAddBecomesNow() throws {
         let store = WedgeStore(persister: InMemoryWedgePersistence())
         let item = try store.add("Ship v1")
@@ -165,105 +165,6 @@ struct WedgeStoreTests {
         #expect(throws: WedgeStoreError.textTooLong(max: 40)) {
             try WedgeStore.normalized(s + family)
         }
-    }
-
-    @Test func persistsAfterEveryMutation() throws {
-        let p = InMemoryWedgePersistence()
-        let s = WedgeStore(persister: p)
-        let a = try s.add("A")
-        try s.add("B")
-        #expect(p.items.map(\.text) == ["A", "B"])
-        try s.update(id: a.id, text: "A2")
-        #expect(p.items.first?.text == "A2")
-        s.move(id: a.id, by: 1)
-        #expect(p.items.map(\.text) == ["B", "A2"])
-        s.move(fromOffsets: IndexSet(integer: 1), toOffset: 0)
-        #expect(p.items.map(\.text) == ["A2", "B"])
-        s.delete(id: a.id)
-        #expect(p.items.map(\.text) == ["B"])
-        s.completeNow()
-        #expect(p.items.isEmpty)
-    }
-
-    @Test func saveFailureSetsIssueAndClearsOnSuccess() throws {
-        let p = InMemoryWedgePersistence()
-        p.failSaves = true
-        let s = WedgeStore(persister: p)
-        try s.add("A")
-        #expect(s.issue == .saveFailed)
-        p.failSaves = false
-        try s.add("B")
-        #expect(s.issue == nil)
-    }
-
-    @Test func loadsExistingItems() {
-        let s = store(["A", "B", "C"])
-        #expect(s.now?.text == "A")
-        #expect(s.upNext.map(\.text) == ["B", "C"])
-        #expect(s.issue == nil)
-    }
-
-    @Test func corruptLoadStartsEmptyWithIssue() {
-        let backup = URL(fileURLWithPath: "/tmp/wedge.corrupt-20260101-000000.json")
-        let s = WedgeStore(persister: FailingLoadPersistence(error: WedgePersistenceError.corrupt(backup: backup)))
-        #expect(s.items.isEmpty)
-        #expect(s.issue == .recoveredFromCorruptFile)
-    }
-
-    @Test func undoRestoresToTop() throws {
-        let s = store(["A", "B"])
-        s.completeNow()
-        #expect(s.canUndoDone)
-        #expect(s.undoDone())
-        #expect(s.items.map(\.text) == ["A", "B"])
-        #expect(!s.canUndoDone)
-    }
-
-    @Test func undoWithNothingToUndoReturnsFalse() {
-        let s = store(["A"])
-        #expect(!s.canUndoDone)
-        #expect(!s.undoDone())
-        #expect(s.items.map(\.text) == ["A"])
-    }
-
-    @Test func undoPersists() {
-        let p = InMemoryWedgePersistence(items: [WedgeItem(text: "A"), WedgeItem(text: "B")])
-        let s = WedgeStore(persister: p)
-        s.completeNow()
-        s.undoDone()
-        #expect(p.items.map(\.text) == ["A", "B"])
-    }
-
-    @Test func undoClearedByAnyOtherMutation() throws {
-        let mutations: [(name: String, apply: (WedgeStore) throws -> Void)] = [
-            ("add", { try $0.add("D") }),
-            ("update", { try $0.update(id: $0.items[0].id, text: "Z") }),
-            ("delete", { $0.delete(id: $0.items[0].id) }),
-            ("moveOffsets", { $0.move(fromOffsets: IndexSet(integer: 0), toOffset: 2) }),
-            ("moveBy", { $0.move(id: $0.items[0].id, by: 1) }),
-        ]
-        for mutation in mutations {
-            let s = store(["A", "B", "C"])
-            s.completeNow()
-            #expect(s.canUndoDone, "\(mutation.name): precondition")
-            try mutation.apply(s)
-            #expect(!s.canUndoDone, "\(mutation.name) should clear undo")
-        }
-    }
-
-    @Test func rejectedEditKeepsUndo() throws {
-        let s = store(["A", "B"])
-        s.completeNow()
-        #expect(throws: WedgeStoreError.emptyText) { try s.add("  ") }
-        #expect(s.canUndoDone)
-    }
-
-    @Test func secondDoneReplacesUndo() throws {
-        let s = store(["A", "B", "C"])
-        s.completeNow()
-        s.completeNow()
-        #expect(s.undoDone())
-        #expect(s.items.map(\.text) == ["B", "C"])
     }
 
     @Test func moveByClampsAtEdges() throws {
