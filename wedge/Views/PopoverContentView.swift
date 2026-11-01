@@ -4,7 +4,7 @@ import SwiftUI
 /// Panel content: one-thing + up-next list with add, inline edit,
 /// delete (context menu or ⌫), drag reorder, and Done via ⌘↩ (plus
 /// status-item shortcuts outside this view).
-/// Hosted in a floating `NSPanel` from `StatusItemController` (not a transient popover).
+/// Hosted in the anchored, non-activating panel owned by `PanelController`.
 ///
 /// `onChange` is called after any list mutation (add/edit/delete/move) so
 /// the controller can refresh the status item title (the store saves itself).
@@ -16,6 +16,7 @@ struct PopoverContentView: View {
     var onChange: () -> Void
     var onDone: () -> Void
 
+    @Environment(PanelController.self) private var panel
     @State private var draft = ""
     @State private var selection: UUID?
     @State private var donePulse = false
@@ -45,10 +46,15 @@ struct PopoverContentView: View {
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
                 .disabled(store.now == nil)
+            Button(WedgeCopy.settingsMenu) { panel.openSettings() }
+                .keyboardShortcut(",", modifiers: .command)
+                .opacity(0)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
         }
         .onAppear { focusAddField() }
-        .onReceive(NotificationCenter.default.publisher(for: .wedgePanelDidOpen)) { _ in
-            focusAddField()
+        .onChange(of: panel.isVisible) { _, isVisible in
+            if isVisible { focusAddField() }
         }
         .onChange(of: doneAction.lastEvent?.id) { _, newID in
             guard newID != nil else { return }

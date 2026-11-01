@@ -3,22 +3,18 @@ import KeyboardShortcuts
 import Observation
 import SwiftUI
 
-extension Notification.Name {
-    static let wedgePanelDidOpen = Notification.Name("wedgePanelDidOpen")
-}
-
 @MainActor
 final class StatusItemController: NSObject {
     private let store: WedgeStore
     private let settings: WedgeSettings
     private let doneAction: DoneAction
     private var statusItem: NSStatusItem?
-    /// Floating panel (not a transient popover) so text editing stays usable.
-    private var panel: NSPanel?
+    /// Created in `start()`; its content calls back into this controller.
+    private var panel: PanelController?
     /// After ⌥-click Done on mouseDown, ignore the matching mouseUp so the panel doesn't open.
     private var suppressNextLeftMouseUp = false
-
-    private static let panelSize = NSSize(width: 300, height: 340)
+    /// Whether the panel was showing when the current click began; decides what its mouseUp does.
+    private var panelWasVisibleAtMouseDown = false
 
     init(store: WedgeStore, settings: WedgeSettings, doneAction: DoneAction) {
         self.store = store
@@ -35,52 +31,33 @@ final class StatusItemController: NSObject {
             button.sendAction(on: [.leftMouseDown, .leftMouseUp, .rightMouseDown])
         }
         statusItem = item
+        let panel = PanelController(
+            content: PopoverContentView(
+                store: store,
+                doneAction: doneAction,
+                onChange: { [weak self] in self?.refreshTitle() },
+                onDone: { [weak self] in self?.markDone() }
+            )
+        )
+        panel.itemFrameProvider = { [weak self] in
+            guard let window = self?.statusItem?.button?.window, let screen = window.screen else { return nil }
+            return (window.frame, screen)
+        }
+        self.panel = panel
         refreshTitle()
         observeAppearance()
-        // After Settings (or panel) closes, return to menu-bar-only if nothing is open.
-        NotificationCenter.default.addObserver(
-            forName: NSWindow.willCloseNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.restoreAccessoryPolicyIfIdle()
-            }
-        }
+        observePanelVisibility()
 
         // Key-down matches AppKit menu shortcut timing; Carbon hotkeys are press-oriented.
         KeyboardShortcuts.onKeyDown(for: .togglePanel) { [weak self] in
             Task { @MainActor in
-                self?.togglePanel()
+                self?.panel?.toggle()
             }
         }
         KeyboardShortcuts.onKeyDown(for: .markDone) { [weak self] in
             Task { @MainActor in
                 self?.markDone()
             }
-        }
-    }
-
-    /// Accessory apps don't own the menu bar, so native ⌘, never fires.
-    /// While a Wedge window is open, briefly behave like a normal app so the
-    /// system Settings… item (⌘,) works — no custom Settings opener.
-    private func presentAsNormalAppWhileWindowsOpen() {
-        if NSApp.activationPolicy() != .regular {
-            NSApp.setActivationPolicy(.regular)
-        }
-        NSApp.activate(ignoringOtherApps: true)
-    }
-
-    private func restoreAccessoryPolicyIfIdle() {
-        let hasVisibleAppWindow = NSApp.windows.contains { window in
-            guard window.isVisible else { return false }
-            if window === statusItem?.button?.window { return false }
-            // Status-item / menu chrome.
-            if String(describing: type(of: window)).contains("NSStatusBar") { return false }
-            return true
-        }
-        if !hasVisibleAppWindow, NSApp.activationPolicy() != .accessory {
-            NSApp.setActivationPolicy(.accessory)
         }
     }
 
@@ -102,6 +79,23 @@ final class StatusItemController: NSObject {
                 self?.observeAppearance()
             }
         }
+    }
+
+    /// Keeps the button highlighted while the panel is open; re-armed after each change.
+    private func observePanelVisibility() {
+        guard let panel else { return }
+        withObservationTracking {
+            _ = panel.isVisible
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                self?.syncButtonHighlight()
+                self?.observePanelVisibility()
+            }
+        }
+    }
+
+    private func syncButtonHighlight() {
+        statusItem?.button?.highlight(panel?.isVisible ?? false)
     }
 
     private var titleColor: NSColor {
@@ -151,6 +145,9 @@ final class StatusItemController: NSObject {
             if optionKeyDown {
                 suppressNextLeftMouseUp = true
                 markDone()
+            } else {
+                // Clicking away from the panel hides it (resign key) around this very event.
+                panelWasVisibleAtMouseDown = panel?.wasVisible(atEventTimestamp: event.timestamp) ?? false
             }
 
         case .leftMouseUp:
@@ -158,7 +155,13 @@ final class StatusItemController: NSObject {
                 suppressNextLeftMouseUp = false
                 return
             }
-            togglePanel()
+            if panelWasVisibleAtMouseDown {
+                panel?.hide()
+            } else {
+                panel?.show()
+            }
+            // The button resets its own highlight when the click ends; reassert ours afterwards.
+            Task { @MainActor [weak self] in self?.syncButtonHighlight() }
 
         default:
             break
@@ -205,84 +208,13 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func menuOpenSettings(_ sender: Any?) {
-        // Own the menu bar so the Settings scene can present, then invoke the
-        // same action the system Settings… menu item uses.
-        presentAsNormalAppWhileWindowsOpen()
-        DispatchQueue.main.async {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        }
+        panel?.openSettings()
     }
 
     /// Every Done entry point lands here: `DoneAction` does the work, then the title catches up.
     private func markDone() {
         guard doneAction.perform() != nil else { return }
         refreshTitle()
-    }
-
-    private func togglePanel() {
-        if panel == nil {
-            panel = makePanel()
-        }
-        guard let panel else { return }
-        if panel.isVisible {
-            panel.orderOut(nil)
-            restoreAccessoryPolicyIfIdle()
-        } else {
-            refreshTitle()
-            centerPanelOnScreen(panel)
-            // Own the menu bar so system Settings… (⌘,) is live — not a custom opener.
-            presentAsNormalAppWhileWindowsOpen()
-            // orderFrontRegardless: accessory apps can otherwise fail to raise
-            // the panel on the active Space / secondary display.
-            panel.orderFrontRegardless()
-            panel.makeKeyAndOrderFront(nil)
-            NotificationCenter.default.post(name: .wedgePanelDidOpen, object: nil)
-        }
-    }
-
-    private func makePanel() -> NSPanel {
-        let hosting = NSHostingController(
-            rootView: PopoverContentView(
-                store: store,
-                doneAction: doneAction,
-                onChange: { [weak self] in
-                    self?.refreshTitle()
-                },
-                onDone: { [weak self] in
-                    self?.markDone()
-                }
-            )
-        )
-        hosting.view.frame.size = Self.panelSize
-
-        let panel = NSPanel(
-            contentRect: NSRect(origin: .zero, size: Self.panelSize),
-            styleMask: [.titled, .closable],
-            backing: .buffered,
-            defer: false
-        )
-        panel.title = WedgeCopy.appName
-        panel.isFloatingPanel = true
-        panel.level = .floating
-        panel.hidesOnDeactivate = false
-        panel.isReleasedWhenClosed = false
-        panel.isMovableByWindowBackground = true
-        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.contentViewController = hosting
-        return panel
-    }
-
-    private func centerPanelOnScreen(_ panel: NSPanel) {
-        let screen = statusItem?.button?.window?.screen
-            ?? NSScreen.screens.first(where: { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) })
-            ?? NSScreen.main
-        guard let visible = screen?.visibleFrame else { return }
-        let size = panel.frame.size
-        let origin = NSPoint(
-            x: visible.midX - size.width / 2,
-            y: visible.midY - size.height / 2
-        )
-        panel.setFrame(NSRect(origin: origin, size: size), display: true)
     }
 }
 

@@ -42,7 +42,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
         LaunchAtLoginService.enableOnLaunch()
         reloadSoundAndObserve()
         let controller = StatusItemController(store: store, settings: settings, doneAction: doneAction)
