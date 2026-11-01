@@ -4,7 +4,6 @@ import Observation
 import SwiftUI
 
 extension Notification.Name {
-    static let wedgeDidPop = Notification.Name("wedgeDidPop")
     static let wedgePanelDidOpen = Notification.Name("wedgePanelDidOpen")
 }
 
@@ -12,19 +11,19 @@ extension Notification.Name {
 final class StatusItemController: NSObject {
     private let store: WedgeStore
     private let settings: WedgeSettings
+    private let doneAction: DoneAction
     private var statusItem: NSStatusItem?
     /// Floating panel (not a transient popover) so text editing stays usable.
     private var panel: NSPanel?
-    private let popSound: PopSoundPlayer
     /// After ⌥-click Done on mouseDown, ignore the matching mouseUp so the panel doesn't open.
     private var suppressNextLeftMouseUp = false
 
     private static let panelSize = NSSize(width: 300, height: 340)
 
-    init(store: WedgeStore, settings: WedgeSettings, soundStore: CustomSoundStore) {
+    init(store: WedgeStore, settings: WedgeSettings, doneAction: DoneAction) {
         self.store = store
         self.settings = settings
-        self.popSound = PopSoundPlayer(settings: settings, soundStore: soundStore)
+        self.doneAction = doneAction
     }
 
     func start() {
@@ -57,7 +56,7 @@ final class StatusItemController: NSObject {
         }
         KeyboardShortcuts.onKeyDown(for: .markDone) { [weak self] in
             Task { @MainActor in
-                self?.performDone()
+                self?.markDone()
             }
         }
     }
@@ -151,7 +150,7 @@ final class StatusItemController: NSObject {
             // ⌥ + click → Done (power-user fast clear).
             if optionKeyDown {
                 suppressNextLeftMouseUp = true
-                performDone()
+                markDone()
             }
 
         case .leftMouseUp:
@@ -202,7 +201,7 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func menuDone(_ sender: Any?) {
-        performDone()
+        markDone()
     }
 
     @objc private func menuOpenSettings(_ sender: Any?) {
@@ -214,11 +213,10 @@ final class StatusItemController: NSObject {
         }
     }
 
-    func performDone() {
-        guard store.completeNow() != nil else { return }
-        popSound.play()
+    /// Every Done entry point lands here: `DoneAction` does the work, then the title catches up.
+    private func markDone() {
+        guard doneAction.perform() != nil else { return }
         refreshTitle()
-        NotificationCenter.default.post(name: .wedgeDidPop, object: nil)
     }
 
     private func togglePanel() {
@@ -246,11 +244,12 @@ final class StatusItemController: NSObject {
         let hosting = NSHostingController(
             rootView: PopoverContentView(
                 store: store,
+                doneAction: doneAction,
                 onChange: { [weak self] in
                     self?.refreshTitle()
                 },
                 onDone: { [weak self] in
-                    self?.performDone()
+                    self?.markDone()
                 }
             )
         )

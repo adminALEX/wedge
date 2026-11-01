@@ -7,19 +7,19 @@ import UniformTypeIdentifiers
 struct WedgeSettingsView: View {
     @Bindable var settings: WedgeSettings
     let soundStore: CustomSoundStore
+    let sound: any DoneSoundPlaying
     @State private var usesAutomaticColor: Bool
     @State private var customColor: Color
     @State private var launchAtLogin = LaunchAtLoginService.isEnabled
-    @State private var previewPlayer: PopSoundPlayer
 
-    init(settings: WedgeSettings, soundStore: CustomSoundStore) {
+    init(settings: WedgeSettings, soundStore: CustomSoundStore, sound: any DoneSoundPlaying) {
         self.settings = settings
         self.soundStore = soundStore
+        self.sound = sound
         _usesAutomaticColor = State(initialValue: settings.customColorHex == nil)
         _customColor = State(
             initialValue: Color(nsColor: settings.customColorHex.flatMap { NSColor(hex: $0) } ?? .labelColor)
         )
-        _previewPlayer = State(initialValue: PopSoundPlayer(settings: settings, soundStore: soundStore))
     }
 
     var body: some View {
@@ -42,7 +42,7 @@ struct WedgeSettingsView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                     Spacer()
-                    Button(WedgeCopy.preview) { previewPlayer.play() }
+                    Button(WedgeCopy.preview) { sound.play() }
                         .disabled(!settings.playsSound)
                     Button(WedgeCopy.chooseEllipsis) { chooseCustomSound() }
                     if let customName = settings.customSoundFileName {
@@ -117,6 +117,7 @@ struct WedgeSettingsView: View {
 #Preview {
     WedgeSettingsView(
         settings: WedgeSettings(defaults: .standard),
-        soundStore: CustomSoundStore(directory: FileWedgePersistence.defaultDirectory())
+        soundStore: CustomSoundStore(directory: FileWedgePersistence.defaultDirectory()),
+        sound: DoneSoundPlayer()
     )
 }

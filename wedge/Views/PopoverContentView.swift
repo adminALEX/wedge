@@ -8,10 +8,11 @@ import SwiftUI
 ///
 /// `onChange` is called after any list mutation (add/edit/delete/move) so
 /// the controller can refresh the status item title (the store saves itself).
-/// `onDone` is the single Done path — the controller owns
-/// `performDone()` (complete-now + refresh).
+/// `onDone` is the single Done path — the controller runs `DoneAction.perform()`
+/// and refreshes the title. `doneAction.lastEvent` drives the brief confirmation pulse.
 struct PopoverContentView: View {
     let store: WedgeStore
+    let doneAction: DoneAction
     var onChange: () -> Void
     var onDone: () -> Void
 
@@ -49,7 +50,8 @@ struct PopoverContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .wedgePanelDidOpen)) { _ in
             focusAddField()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .wedgeDidPop)) { _ in
+        .onChange(of: doneAction.lastEvent?.id) { _, newID in
+            guard newID != nil else { return }
             withAnimation(.easeOut(duration: 0.15)) { donePulse = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 withAnimation(.easeIn(duration: 0.15)) { donePulse = false }

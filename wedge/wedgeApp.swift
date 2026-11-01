@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppKit
+import Observation
 
 @main
 struct wedgeApp: App {
@@ -15,7 +16,11 @@ struct wedgeApp: App {
     var body: some Scene {
         // Native Settings scene — system installs Settings… with ⌘, in the app menu.
         Settings {
-            WedgeSettingsView(settings: appDelegate.settings, soundStore: appDelegate.soundStore)
+            WedgeSettingsView(
+                settings: appDelegate.settings,
+                soundStore: appDelegate.soundStore,
+                sound: appDelegate.sound
+            )
         }
     }
 }
@@ -28,12 +33,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     let settings = WedgeSettings(defaults: .standard)
     let soundStore = CustomSoundStore(directory: FileWedgePersistence.defaultDirectory())
+    let sound: any DoneSoundPlaying = DoneSoundPlayer()
+    private lazy var doneAction = DoneAction(
+        store: store,
+        settings: settings,
+        sound: sound,
+        announce: { AccessibilityNotification.Announcement($0).post() }
+    )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         LaunchAtLoginService.enableOnLaunch()
-        let controller = StatusItemController(store: store, settings: settings, soundStore: soundStore)
+        reloadSoundAndObserve()
+        let controller = StatusItemController(store: store, settings: settings, doneAction: doneAction)
         controller.start()
         statusItemController = controller
+    }
+
+    /// Loads the chosen sound now and again whenever the custom file changes; re-armed after each change.
+    private func reloadSoundAndObserve() {
+        sound.load(customURL: soundStore.url(for: settings.customSoundFileName))
+        withObservationTracking {
+            _ = settings.customSoundFileName
+        } onChange: { [weak self] in
+            // onChange runs before the new value lands; hop a turn so the reload sees it.
+            Task { @MainActor [weak self] in
+                self?.reloadSoundAndObserve()
+            }
+        }
     }
 }
