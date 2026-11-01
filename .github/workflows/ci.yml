@@ -25,10 +25,13 @@ jobs:
           sw_vers
           xcodebuild -list -project wedge.xcodeproj
 
-      - name: Lint (swift-format)
+      - name: swift-format check
         run: |
           set -o pipefail
           xcrun swift-format --version
+          # Format in place first, so a failure prints the exact patch to apply (git apply) in this log.
+          xcrun swift-format format -i -r wedge wedgeTests wedgeUITests
+          git diff --exit-code || { echo "::error::swift-format changed files; apply the patch printed above"; exit 1; }
           xcrun swift-format lint -r --strict wedge wedgeTests wedgeUITests 2>&1 | tee lint.log
 
       - name: Unit tests
@@ -40,7 +43,10 @@ jobs:
             CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
             2>&1 | tee xcodebuild.log | xcbeautify --renderer github-actions
 
+      # UI tests cost 10x Mac minutes on a private repo: run them on manual dispatch or when the
+      # head commit message contains [ui-tests].
       - name: UI tests
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[ui-tests]')
         run: |
           set -o pipefail
           xcodebuild test \
