@@ -20,7 +20,9 @@ enum WedgeCopy {
     // Status item / menu
     static let settingsMenu = "Settings…"
     static var quitMenu: String { "Quit \(appName)" }
-    static let statusItemAccessibility = appName
+    static let undoDoneMenu = "Undo Done"
+    static func statusItemNow(_ title: String) -> String { "\(appName), Now: \(title)" }
+    static let statusItemNothingNow = "\(appName), nothing now"
 
     // Settings — appearance
     static let bold = "Bold"
