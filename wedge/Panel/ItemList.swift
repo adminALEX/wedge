@@ -64,7 +64,6 @@ struct ItemList: View {
         .scrollBounceBehavior(.basedOnSize)
         .environment(\.defaultMinListRowHeight, Self.rowHeight)
         .frame(height: height)
-        .focused(focus, equals: .list)
         .modifier(ItemListKeys(list: self))
         .onChange(of: store.items) { _, items in
             selection = PanelRows.retargetedSelection(selection, in: items)
