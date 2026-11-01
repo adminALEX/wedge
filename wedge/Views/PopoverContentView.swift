@@ -7,9 +7,9 @@ import SwiftUI
 /// Hosted in a floating `NSPanel` from `StatusItemController` (not a transient popover).
 ///
 /// `onChange` is called after any list mutation (add/edit/delete/move) so
-/// the controller can persist and refresh the status item title.
+/// the controller can refresh the status item title (the store saves itself).
 /// `onDone` is the single Done path — the controller owns
-/// `performDone()` (complete-one-thing + persist + refresh).
+/// `performDone()` (complete-now + refresh).
 struct PopoverContentView: View {
     let store: WedgeStore
     var onChange: () -> Void
@@ -43,7 +43,7 @@ struct PopoverContentView: View {
                 .opacity(0)
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
-                .disabled(store.oneThing == nil)
+                .disabled(store.now == nil)
         }
         .onAppear { focusAddField() }
         .onReceive(NotificationCenter.default.publisher(for: .wedgePanelDidOpen)) { _ in
@@ -65,7 +65,7 @@ struct PopoverContentView: View {
                     .listRowInsets(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
             }
             .onMove { indices, newOffset in
-                store.move(from: indices, to: newOffset)
+                store.move(fromOffsets: indices, toOffset: newOffset)
                 onChange()
             }
             .onDelete { indexSet in
@@ -90,7 +90,7 @@ struct PopoverContentView: View {
             NotionDragHandle()
             ItemRow(
                 item: item,
-                isOneThing: item.id == store.oneThing?.id,
+                isOneThing: item.id == store.now?.id,
                 isEditing: editingItemID == item.id,
                 focus: $focus,
                 onStartEditing: {

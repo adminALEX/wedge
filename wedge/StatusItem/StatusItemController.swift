@@ -10,7 +10,6 @@ extension Notification.Name {
 @MainActor
 final class StatusItemController: NSObject {
     private let store: WedgeStore
-    private let persistence: any WedgePersisting
     private var statusItem: NSStatusItem?
     /// Floating panel (not a transient popover) so text editing stays usable.
     private var panel: NSPanel?
@@ -20,9 +19,8 @@ final class StatusItemController: NSObject {
 
     private static let panelSize = NSSize(width: 300, height: 340)
 
-    init(store: WedgeStore, persistence: any WedgePersisting) {
+    init(store: WedgeStore) {
         self.store = store
-        self.persistence = persistence
     }
 
     func start() {
@@ -99,7 +97,7 @@ final class StatusItemController: NSObject {
 
     func refreshTitle() {
         guard let button = statusItem?.button else { return }
-        if let text = store.oneThing?.text {
+        if let text = store.now?.text {
             button.image = nil
             button.title = ""
             button.attributedTitle = NSAttributedString(
@@ -120,11 +118,6 @@ final class StatusItemController: NSObject {
             button.image = image
             button.imagePosition = .imageOnly
         }
-    }
-
-    func persistAndRefresh() {
-        try? persistence.save(store.items)
-        refreshTitle()
     }
 
     @objc private func statusItemPrimaryAction(_ sender: NSStatusBarButton) {
@@ -163,7 +156,7 @@ final class StatusItemController: NSObject {
             keyEquivalent: ""
         )
         doneItem.target = self
-        doneItem.isEnabled = store.oneThing != nil
+        doneItem.isEnabled = store.now != nil
         // Show the remappable global Done chord beside the menu title.
         doneItem.setShortcut(for: .markDone)
         menu.addItem(doneItem)
@@ -202,9 +195,9 @@ final class StatusItemController: NSObject {
     }
 
     func performDone() {
-        guard store.completeOneThing() != nil else { return }
+        guard store.completeNow() != nil else { return }
         popSound.play()
-        persistAndRefresh()
+        refreshTitle()
         NotificationCenter.default.post(name: .wedgeDidPop, object: nil)
     }
 
@@ -234,7 +227,7 @@ final class StatusItemController: NSObject {
             rootView: PopoverContentView(
                 store: store,
                 onChange: { [weak self] in
-                    self?.persistAndRefresh()
+                    self?.refreshTitle()
                 },
                 onDone: { [weak self] in
                     self?.performDone()

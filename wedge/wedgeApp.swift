@@ -23,16 +23,14 @@ struct wedgeApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItemController: StatusItemController?
-    private let store = WedgeStore()
-    private let persistence = UserDefaultsWedgePersistence()
+    private let store = WedgeStore(
+        persister: FileWedgePersistence(directory: FileWedgePersistence.defaultDirectory())
+    )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         LaunchAtLoginService.enableOnLaunch()
-        if let items = try? persistence.load() {
-            store.replaceAll(items)
-        }
-        let controller = StatusItemController(store: store, persistence: persistence)
+        let controller = StatusItemController(store: store)
         controller.start()
         statusItemController = controller
     }

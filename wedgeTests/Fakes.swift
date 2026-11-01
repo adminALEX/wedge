@@ -1,0 +1,21 @@
+import Foundation
+@testable import wedge
+
+/// A store over in-memory persistence, pre-filled with items of the given texts.
+@MainActor
+func store(_ texts: [String]) -> WedgeStore {
+    WedgeStore(persister: InMemoryWedgePersistence(items: texts.map { WedgeItem(text: $0) }))
+}
+
+/// A persister whose `load()` always throws `error`.
+@MainActor
+final class FailingLoadPersistence: WedgePersisting {
+    let error: Error
+
+    init(error: Error) {
+        self.error = error
+    }
+
+    func load() throws -> [WedgeItem] { throw error }
+    func save(_ items: [WedgeItem]) throws {}
+}
