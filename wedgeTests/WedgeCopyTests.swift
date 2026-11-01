@@ -2,6 +2,7 @@ import Testing
 @testable import wedge
 
 @Suite("WedgeCopy")
+@MainActor
 struct WedgeCopyTests {
     @Test("canonical product words are non-empty and stable")
     func canonicalWords() {
