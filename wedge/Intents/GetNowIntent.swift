@@ -1,7 +1,7 @@
 import AppIntents
 
 /// Returns the Now item's text, for use in other shortcuts.
-nonisolated struct GetNowIntent: AppIntent {
+struct GetNowIntent: AppIntent {
     static let title: LocalizedStringResource = "Get Now"
     static let openAppWhenRun = false
 

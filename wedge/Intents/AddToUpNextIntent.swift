@@ -1,7 +1,7 @@
 import AppIntents
 
 /// Appends to Up Next (or becomes Now when the list is empty), with the panel's validation.
-nonisolated struct AddToUpNextIntent: AppIntent {
+struct AddToUpNextIntent: AppIntent {
     static let title: LocalizedStringResource = "Add to Up Next"
     static let openAppWhenRun = false
 

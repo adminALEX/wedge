@@ -1,7 +1,7 @@
 import AppIntents
 
 /// Runs the same Done path as the panel and menu bar: sound, menu-bar bump and panel animation.
-nonisolated struct MarkDoneIntent: AppIntent {
+struct MarkDoneIntent: AppIntent {
     static let title: LocalizedStringResource = "Mark Done"
     static let openAppWhenRun = false
 
