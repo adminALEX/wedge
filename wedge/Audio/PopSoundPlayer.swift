@@ -4,7 +4,7 @@ import AppKit
 @MainActor
 final class PopSoundPlayer {
     private var sound: NSSound?
-    private var observer: NSObjectProtocol?
+    nonisolated(unsafe) private var observer: NSObjectProtocol?
 
     init() {
         reload()
