@@ -33,6 +33,7 @@ struct PanelView: View {
     @State private var selection: UUID?
     @State private var edit: RowEdit?
     @FocusState private var focus: PanelFocus?
+    @State private var focusTrace: [String] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -90,6 +91,10 @@ struct PanelView: View {
         .task(id: hintEventID) { await expireUndoHint() }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(WedgeCopy.appName)
+        .accessibilityValue(focusTrace.joined(separator: " > "))
+        .onChange(of: focus) { old, new in
+            focusTrace.append("\(String(describing: old))->\(String(describing: new))")
+        }
     }
 
     /// Panel-wide shortcuts. Disabled buttons let the key go on (⌘Z then reaches the field's undo).
