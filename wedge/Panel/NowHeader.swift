@@ -1,12 +1,13 @@
 import SwiftUI
 
-/// The Now item: a ring that marks it Done, then its title, semibold and larger than rows.
-struct NowHeader: View {
+/// The Now row: a ring that marks it Done, then its title, semibold and larger than other rows.
+struct NowHeader<Title: View>: View {
     let item: WedgeItem
     let doneAction: DoneAction
+    @ViewBuilder let title: Title
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 6) {
             Button {
                 doneAction.perform()
             } label: {
@@ -18,11 +19,7 @@ struct NowHeader: View {
             .buttonStyle(.plain)
             .accessibilityLabel(WedgeCopy.doneAccessibility(item.text))
 
-            Text(item.text)
-                .font(.title3.weight(.semibold))
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityLabel(WedgeCopy.nowAccessibility(item.text))
+            title
         }
     }
 }

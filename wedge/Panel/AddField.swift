@@ -45,6 +45,7 @@ struct AddField: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
             .background(.quaternary, in: .rect(cornerRadius: 8))
+            .focusIndicator(focus.wrappedValue == .add, cornerRadius: 8)
 
             if let message {
                 Text(message)

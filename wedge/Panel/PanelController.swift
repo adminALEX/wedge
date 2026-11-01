@@ -17,6 +17,10 @@ final class PanelController {
         Log.panel.error("Settings opener not ready")
     }
 
+    /// Set by the list while a row is being edited: cancels the edit and returns true
+    /// (false when there is none). Esc on the panel tries this before closing.
+    @ObservationIgnored var cancelEdit: (() -> Bool)?
+
     @ObservationIgnored private let panel = WedgePanel()
     @ObservationIgnored private let hostingView = NSHostingView(rootView: AnyView(EmptyView()))
     /// Present only while the panel is visible: a click in another app or menu-bar extra hides it.
@@ -26,6 +30,7 @@ final class PanelController {
     init<Content: View>(content: Content) {
         panel.contentView = hostingView
         panel.onDismiss = { [weak self] in self?.hide() }
+        panel.onCancel = { [weak self] in self?.cancelEdit?() ?? false }
         hostingView.rootView = AnyView(
             content
                 .background {

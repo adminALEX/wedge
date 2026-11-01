@@ -7,18 +7,20 @@ enum PanelFocus: Hashable {
     case row(UUID)
 }
 
-/// An Up Next row being edited in place, with its uncommitted text.
+/// A row being edited in place, with its uncommitted text.
 struct RowEdit: Equatable {
     let id: UUID
     var text: String
 }
 
-/// The panel content (spec §3.1, A1) on Liquid Glass: issue banner, Now, Up Next, add field
-/// and hint row. Owns focus, selection, the add draft and the inline edit, so ⌘Z can tell
-/// unsaved typing from Undo Done.
+/// The panel content (spec §3.1, A1) on Liquid Glass: issue banner, the Now label and the list
+/// (Now, Up Next), add field and hint row. Owns focus, selection, the add draft and the inline
+/// edit, so ⌘Z can tell unsaved typing from Undo Done.
 struct PanelView: View {
     let store: WedgeStore
     let doneAction: DoneAction
+    /// Posts a VoiceOver announcement (the same path `DoneAction` uses).
+    let announce: (String) -> Void
 
     @Environment(PanelController.self) private var panel
     @State private var draft = ""
@@ -31,21 +33,18 @@ struct PanelView: View {
             if let issue = store.issue {
                 IssueBanner(issue: issue)
             }
-            if let now = store.now {
-                section(WedgeCopy.now) {
-                    NowHeader(item: now, doneAction: doneAction)
-                }
-                Divider()
-                section(WedgeCopy.upNext) {
-                    if !store.upNext.isEmpty {
-                        UpNextList(
-                            store: store,
-                            selection: $selection,
-                            edit: $edit,
-                            focus: $focus,
-                            onLeaveBottom: focusAddField
-                        )
-                    }
+            if !store.items.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    SectionLabel(WedgeCopy.now)
+                    ItemList(
+                        store: store,
+                        doneAction: doneAction,
+                        announce: announce,
+                        selection: $selection,
+                        edit: $edit,
+                        focus: $focus,
+                        onLeaveBottom: focusAddField
+                    )
                 }
             }
             AddField(
@@ -68,17 +67,12 @@ struct PanelView: View {
         .onChange(of: panel.isVisible) { _, isVisible in
             if isVisible { focusAddField() }
         }
+        .onChange(of: store.items.isEmpty) { _, isEmpty in
+            // The list went away (last row deleted or Done) and took focus with it.
+            if isEmpty { focusAddField() }
+        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(WedgeCopy.appName)
-    }
-
-    private func section<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.secondary)
-            content()
-        }
     }
 
     /// Panel-wide shortcuts. Disabled buttons let the key go on (⌘Z then reaches the field's undo).
@@ -123,8 +117,23 @@ struct PanelView: View {
 
     /// ↑ from the add field enters the list at its last row.
     private func selectLastRow() {
-        guard let last = store.upNext.last else { return }
+        guard let last = store.items.last else { return }
         selection = last.id
         focus = .list
+    }
+}
+
+/// The small section label ("Now", "Up Next").
+struct SectionLabel: View {
+    let text: String
+
+    init(_ text: String) {
+        self.text = text
+    }
+
+    var body: some View {
+        Text(text)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.secondary)
     }
 }

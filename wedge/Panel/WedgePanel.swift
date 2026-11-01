@@ -4,6 +4,8 @@ import AppKit
 final class WedgePanel: NSPanel {
     /// Called when the user dismisses the panel (Esc) or it loses key status.
     var onDismiss: () -> Void = {}
+    /// Called first on Esc: true when it cancelled something (an inline edit), so the panel stays.
+    var onCancel: () -> Bool = { false }
 
     init() {
         super.init(
@@ -24,8 +26,9 @@ final class WedgePanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 
-    /// Esc. An inline edit consumes Esc itself (cancelling the edit), so it never gets here.
+    /// Esc: cancels an inline edit if one is open, otherwise closes.
     override func cancelOperation(_ sender: Any?) {
+        guard !onCancel() else { return }
         onDismiss()
     }
 

@@ -25,4 +25,19 @@ struct InputLimitTests {
         let s = String(repeating: "a", count: 40)
         #expect(InputLimit.filter(proposed: s, previous: "").text == s)
     }
+
+    @Test func overLimitPasteRevertsAndStaysRefused() {
+        let long = String(repeating: "a", count: 41)
+        let paste = InputLimit.change(old: "abc", new: long)
+        #expect(paste?.text == "abc")
+        #expect(paste?.refused == true)
+        // The revert pass (long → "abc") is skipped, so `refused` keeps its value.
+        #expect(InputLimit.change(old: long, new: "abc") == nil)
+    }
+
+    @Test func acceptedChangeClearsRefused() {
+        let typed = InputLimit.change(old: "ab", new: "abc")
+        #expect(typed?.text == "abc")
+        #expect(typed?.refused == false)
+    }
 }

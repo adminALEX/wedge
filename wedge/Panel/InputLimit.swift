@@ -13,6 +13,14 @@ enum InputLimit {
     static func filter(proposed: String, previous: String) -> (text: String, refused: Bool) {
         proposed.count > Self.max ? (previous, true) : (proposed, false)
     }
+
+    /// What to do when bound text changes from `old` to `new`: the text to keep and whether the
+    /// change was refused, or nil for the change that puts a refused proposal back (accepted
+    /// values never exceed the cap, so an over-long `old` can only be that proposal).
+    static func change(old: String, new: String) -> (text: String, refused: Bool)? {
+        guard old.count <= Self.max else { return nil }
+        return filter(proposed: new, previous: old)
+    }
 }
 
 extension View {
@@ -20,10 +28,7 @@ extension View {
     /// previous value and `refused` becomes true until the next accepted change.
     func inputLimit(_ text: Binding<String>, refused: Binding<Bool>) -> some View {
         onChange(of: text.wrappedValue) { old, new in
-            // Accepted values never exceed the cap, so an over-long `old` is the refused
-            // proposal this handler just put back; leave `refused` as it is.
-            guard old.count <= InputLimit.max else { return }
-            let result = InputLimit.filter(proposed: new, previous: old)
+            guard let result = InputLimit.change(old: old, new: new) else { return }
             refused.wrappedValue = result.refused
             if result.refused { text.wrappedValue = result.text }
         }

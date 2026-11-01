@@ -9,6 +9,8 @@ final class AppEnvironment {
     let settings: WedgeSettings
     let sound: any DoneSoundPlaying
     let doneAction: DoneAction
+    /// Posts a VoiceOver announcement; shared by Done and the panel's move announcements.
+    let announce: (String) -> Void
     let soundStore: CustomSoundStore
     let panel: PanelController
     let statusItem: StatusItemController
@@ -39,19 +41,18 @@ final class AppEnvironment {
         }
         let store = WedgeStore(persister: persister)
         let settings = WedgeSettings(defaults: defaults)
-        let doneAction = DoneAction(
-            store: store,
-            settings: settings,
-            sound: sound,
-            announce: { AccessibilityNotification.Announcement($0).post() }
+        let announce: (String) -> Void = { AccessibilityNotification.Announcement($0).post() }
+        let doneAction = DoneAction(store: store, settings: settings, sound: sound, announce: announce)
+        let panel = PanelController(
+            content: PanelView(store: store, doneAction: doneAction, announce: announce)
         )
-        let panel = PanelController(content: PanelView(store: store, doneAction: doneAction))
         let hotkeys = HotkeyController(panel: panel, doneAction: doneAction)
 
         self.store = store
         self.settings = settings
         self.sound = sound
         self.doneAction = doneAction
+        self.announce = announce
         self.soundStore = CustomSoundStore(directory: directory)
         self.panel = panel
         self.hotkeys = hotkeys
