@@ -1,0 +1,18 @@
+Attributes: Group, 0xb233a5cc0, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Element subtree:
+ →Group, 0xb233a5cc0, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Path to element:
+ →Application, 0xb233a52c0, pid: 4208, title: 'wedge'
+  ↳Dialog, 0xb233a5400, {{570.0, 36.0}, {320.0, 280.0}}
+   ↳Group, 0xb233a5540, {{570.0, 36.0}, {320.0, 280.0}}
+    ↳Group, 0xb233a5680, {{582.0, 48.0}, {296.0, 256.0}}, label: 'Wedge', Keyboard Focused
+     ↳ScrollView, 0xb233a57c0, {{582.0, 65.0}, {296.0, 176.0}}
+      ↳Outline, 0xb233a5900, {{581.0, 64.0}, {298.0, 178.0}}
+       ↳Any, 0xb233a5a40, {{inf, inf}, {0.0, 0.0}}
+        ↳Any, 0xb233a5b80, {{inf, inf}, {0.0, 0.0}}
+         ↳Group, 0xb233a5cc0, {{606.0, 191.0}, {259.0, 16.0}}, identifier: 'upNextRow-4', label: '4 of 5, Write release notes'
+Query chain:
+ →Find: Target Application 'com.xela.wedge'
+  ↪︎Find: Descendants matching type Any
+    ↪︎Find: Elements matching predicate '"upNextRow-4" IN identifiers'
+      ↪︎Find: First Match
