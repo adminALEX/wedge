@@ -1,5 +1,6 @@
 import AppIntents
 import AppKit
+import os
 import SwiftUI
 
 @main
