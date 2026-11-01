@@ -87,7 +87,7 @@ struct IntentsTests {
         #expect(String(localized: AddToUpNextIntent.title) == WedgeCopy.addToUpNextTitle)
         #expect(String(localized: MarkDoneIntent.title) == WedgeCopy.markDoneTitle)
         #expect(String(localized: GetNowIntent.title) == WedgeCopy.getNowTitle)
-        #expect(WedgeCopy.textParameterTitle == "Text")
+        #expect(WedgeCopy.addToUpNextPrompt == "What do you want to add?")
     }
 
     @Test func intentsRunInTheBackground() {

@@ -5,7 +5,7 @@ struct AddToUpNextIntent: AppIntent {
     static let title: LocalizedStringResource = "Add to Up Next"
     static let openAppWhenRun = false
 
-    @Parameter(title: "Text")
+    @Parameter(title: "Text", requestValueDialog: "What do you want to add?")
     var text: String
 
     @Dependency var store: WedgeStore

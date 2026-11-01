@@ -1,3 +1,4 @@
+import AppIntents
 import AppKit
 import SwiftUI
 
@@ -19,6 +20,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// list or builds the panel. Construction starts nothing: `start()` creates the status item,
     /// hotkeys and sound.
     lazy var environment = AppEnvironment(mode: mode)
+
+    override init() {
+        super.init()
+        registerIntentDependencies()
+    }
+
+    /// Registered as early as possible so an intent that launches Wedge in the background can
+    /// resolve them, but as lazy factories: the environment is still built on first use only.
+    /// Intents resolve their dependencies on the main actor. The unit tests call the intents'
+    /// static `run` functions directly.
+    private func registerIntentDependencies() {
+        guard mode != .unitTest else { return }
+        AppDependencyManager.shared.add { MainActor.assumeIsolated { self.environment.store } }
+        AppDependencyManager.shared.add { MainActor.assumeIsolated { self.environment.doneAction } }
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         switch mode {

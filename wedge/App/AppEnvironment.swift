@@ -1,4 +1,3 @@
-import AppIntents
 import AppKit
 import Observation
 import SwiftUI
@@ -48,12 +47,6 @@ final class AppEnvironment {
             content: PanelView(store: store, doneAction: doneAction, announce: announce)
         )
         let hotkeys = HotkeyController(panel: panel, doneAction: doneAction)
-        if mode != .unitTest {
-            // Intents reach the same store and Done path as the UI; the unit tests call the
-            // intents' static `run` functions directly.
-            AppDependencyManager.shared.add { store }
-            AppDependencyManager.shared.add { doneAction }
-        }
 
         self.store = store
         self.settings = settings
