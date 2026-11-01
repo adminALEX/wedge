@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import wedge
 
@@ -8,14 +9,11 @@ struct WedgeCopyTests {
     func canonicalWords() {
         #expect(!WedgeCopy.appName.isEmpty)
         #expect(WedgeCopy.done == "Done")
-        #expect(WedgeCopy.oneThing == "one thing")
         #expect(WedgeCopy.now == "Now")
         #expect(WedgeCopy.upNext == "Up Next")
         #expect(WedgeCopy.addNowPlaceholder == "What are you on now?")
         #expect(WedgeCopy.addUpNextPlaceholder == "Add to Up Next…")
-        #expect(WedgeCopy.doneShortcut == WedgeCopy.done)
         #expect(WedgeCopy.quitMenu.contains(WedgeCopy.appName))
-        #expect(WedgeCopy.soundFooter.contains(WedgeCopy.done))
     }
 
     @Test("panel copy matches the spec")
@@ -39,5 +37,38 @@ struct WedgeCopyTests {
             IssueBanner.message(for: .loadFailed)
                 == "Couldn't read your list. Changes won't be saved until Wedge can read it."
         )
+    }
+
+    @Test("settings copy matches the spec")
+    func settingsCopy() {
+        #expect(WedgeCopy.menuBarSection == "Menu Bar")
+        #expect(WedgeCopy.keyboardSection == "Keyboard")
+        #expect(WedgeCopy.bold == "Bold")
+        #expect(WedgeCopy.color == "Color")
+        #expect(WedgeCopy.automatic == "Automatic")
+        #expect(WedgeCopy.custom == "Custom")
+        #expect(WedgeCopy.playSound == "Play sound")
+        #expect(WedgeCopy.sound == "Sound")
+        #expect(WedgeCopy.defaultSoundName == "Pop (default)")
+        #expect(WedgeCopy.chooseEllipsis == "Choose…")
+        #expect(WedgeCopy.useDefault == "Use Default")
+        #expect(WedgeCopy.reset == "Reset")
+        #expect(WedgeCopy.openAtLogin == "Open at login")
+        #expect(WedgeCopy.openLoginItems == "Open Login Items")
+        #expect(WedgeCopy.aboutVersion("1.0") == "Wedge 1.0")
+        #expect(WedgeCopy.gitHub == "GitHub")
+        #expect(WedgeCopy.gitHubAddress == "https://github.com/adminALEX/wedge")
+        #expect(
+            WedgeCopy.loginChangeFailed
+                == "Couldn't change this. Check System Settings › General › Login Items."
+        )
+    }
+
+    @Test("sound errors map to the two inline messages")
+    func soundErrorCopy() {
+        #expect(WedgeCopy.soundMessage(for: CustomSoundError.tooLong) == "That sound is longer than 3 seconds.")
+        #expect(WedgeCopy.soundMessage(for: CustomSoundError.unreadable) == "Couldn't read that sound file.")
+        #expect(WedgeCopy.soundMessage(for: CustomSoundError.unsupportedType) == "Couldn't read that sound file.")
+        #expect(WedgeCopy.soundMessage(for: CocoaError(.fileWriteOutOfSpace)) == "Couldn't read that sound file.")
     }
 }

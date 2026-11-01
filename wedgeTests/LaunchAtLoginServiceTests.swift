@@ -1,4 +1,5 @@
 import Foundation
+import ServiceManagement
 import Testing
 @testable import wedge
 
@@ -29,5 +30,13 @@ struct LaunchAtLoginServiceTests {
         defaults.set(true, forKey: LaunchAtLoginService.didRequestKey)
         LaunchAtLoginService.enableOnLaunch(defaults: defaults)
         #expect(defaults.bool(forKey: LaunchAtLoginService.didRequestKey) == true)
+    }
+
+    @Test("service status maps to the three states Settings distinguishes")
+    func statusMapping() {
+        #expect(LaunchAtLoginService.state(for: .enabled) == .enabled)
+        #expect(LaunchAtLoginService.state(for: .notRegistered) == .disabled)
+        #expect(LaunchAtLoginService.state(for: .notFound) == .disabled)
+        #expect(LaunchAtLoginService.state(for: .requiresApproval) == .requiresApproval)
     }
 }

@@ -7,23 +7,38 @@ import Foundation
 import ServiceManagement
 import os.log
 
+/// What Settings needs to tell apart: on, off, or registered but waiting for the user in System Settings.
+enum LoginItemState: Equatable {
+    case enabled, disabled, requiresApproval
+}
+
 enum LaunchAtLoginService {
     private static let log = Logger(subsystem: "com.xela.wedge", category: "LaunchAtLogin")
 
     /// UserDefaults flag recording that we already asked for the login item once.
     static let didRequestKey = "wedge.didRequestLoginItem"
 
-    static var isEnabled: Bool {
-        SMAppService.mainApp.status == .enabled
+    static func state(for status: SMAppService.Status) -> LoginItemState {
+        switch status {
+        case .enabled: .enabled
+        case .requiresApproval: .requiresApproval
+        case .notRegistered, .notFound: .disabled
+        @unknown default: .disabled
+        }
+    }
+
+    static var state: LoginItemState {
+        state(for: SMAppService.mainApp.status)
     }
 
     static func setEnabled(_ enabled: Bool) throws {
         let service = SMAppService.mainApp
         if enabled {
-            guard service.status != .enabled else { return }
+            // Already registered (even if awaiting approval): registering again would throw.
+            guard state == .disabled else { return }
             try service.register()
         } else {
-            guard service.status != .notRegistered else { return }
+            guard state != .disabled else { return }
             try service.unregister()
         }
     }
@@ -40,7 +55,7 @@ enum LaunchAtLoginService {
         do {
             try service.register()
         } catch {
-            log.error("Failed to register login item: \(error.localizedDescription, privacy: .public)")
+            log.error("Failed to register login item: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

@@ -7,7 +7,6 @@ enum WedgeCopy {
 
     // Product verbs / nouns (canonical language)
     static let done = "Done"
-    static let oneThing = "one thing"
     static let now = "Now"
     static let upNext = "Up Next"
     static let delete = "Delete"
@@ -47,34 +46,43 @@ enum WedgeCopy {
     static func statusItemNow(_ title: String) -> String { "\(appName), Now: \(title)" }
     static let statusItemNothingNow = "\(appName), nothing now"
 
-    // Settings — appearance
-    static let bold = "Bold"
-    static let automaticColor = "Automatic color"
-    static let color = "Color"
-    static let appearanceFooter =
-        "Applies to the \(oneThing) in the menu bar. Automatic follows the system label color."
+    // Settings — groups
+    static let menuBarSection = "Menu Bar"
+    static let keyboardSection = "Keyboard"
 
-    // Settings — sound
-    static let soundSection = "Sound"
+    // Settings — menu bar
+    static let bold = "Bold"
+    static let color = "Color"
+    static let automatic = "Automatic"
+    static let custom = "Custom"
+
+    // Settings — done sound
     static let playSound = "Play sound"
-    static let defaultPopSound = "Default pop sound"
-    static func customPopSoundLabel(_ fileName: String) -> String { "Custom: \(fileName)" }
+    static let sound = "Sound"
+    static let defaultSoundName = "Pop (default)"
     static let preview = "Preview"
     static let chooseEllipsis = "Choose…"
-    static let useDefault = "Use default"
-    static var soundFooter: String {
-        "Played when you mark \(done). Custom files must be 3 seconds or shorter (AIFF, WAV, MP3, M4A, or CAF)."
+    static let useDefault = "Use Default"
+    static let soundTooLong = "That sound is longer than 3 seconds."
+    static let soundUnreadable = "Couldn't read that sound file."
+    /// Inline message for a custom sound that could not be installed. An unsupported file type,
+    /// an unreadable file and a failed copy all read the same to the user.
+    static func soundMessage(for error: any Error) -> String {
+        switch error as? CustomSoundError {
+        case .tooLong: soundTooLong
+        case .unsupportedType, .unreadable, nil: soundUnreadable
+        }
     }
 
-    // Settings — general
-    static let generalSection = "General"
-    static let launchAtLogin = "Launch at login"
-    static let launchAtLoginFooter =
-        "Starts \(appName) automatically when you log in to your Mac."
-
     // Settings — keyboard
-    static let keyboardShortcutsSection = "Keyboard shortcuts"
     static let showWedgeShortcut = "Show Wedge"
-    static var doneShortcut: String { done }
-    static let resetToDefaults = "Reset to defaults"
+    static let reset = "Reset"
+
+    // Settings — login item and about
+    static let openAtLogin = "Open at login"
+    static let openLoginItems = "Open Login Items"
+    static let loginChangeFailed = "Couldn't change this. Check System Settings › General › Login Items."
+    static func aboutVersion(_ version: String) -> String { "\(appName) \(version)" }
+    static let gitHub = "GitHub"
+    static let gitHubAddress = "https://github.com/adminALEX/wedge"
 }

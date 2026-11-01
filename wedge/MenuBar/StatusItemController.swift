@@ -85,8 +85,8 @@ final class StatusItemController: NSObject {
         StatusItemBump.play(on: button)
     }
 
-    /// The template glyph; an SF Symbol stands in until the asset ships.
-    private static var glyph: NSImage? {
+    /// The template glyph (also drawn by Settings' preview); an SF Symbol stands in until the asset ships.
+    static var glyph: NSImage? {
         let image = NSImage(named: "MenuBarGlyph") ?? NSImage(systemSymbolName: "leaf", accessibilityDescription: nil)
         image?.isTemplate = true
         return image

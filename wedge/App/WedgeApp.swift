@@ -8,11 +8,7 @@ struct WedgeApp: App {
     var body: some Scene {
         // Native Settings scene: the system installs Settings… with ⌘, in the app menu.
         Settings {
-            WedgeSettingsView(
-                settings: appDelegate.environment.settings,
-                soundStore: appDelegate.environment.soundStore,
-                sound: appDelegate.environment.sound
-            )
+            SettingsView(environment: appDelegate.environment)
         }
     }
 }
