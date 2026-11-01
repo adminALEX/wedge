@@ -9,6 +9,7 @@ private final class MemoryPersistence: WedgePersisting, @unchecked Sendable {
 }
 
 @Suite("Wedge persistence")
+@MainActor
 struct WedgeStorePersistenceTests {
 
     @Test("UserDefaults round-trip")

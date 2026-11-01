@@ -2,7 +2,13 @@ import Foundation
 import Testing
 @testable import wedge
 
+/// Mutable flag the notification observer (a @Sendable closure) can set.
+private final class NotificationFlag: @unchecked Sendable {
+    var value = false
+}
+
 @Suite("PopSoundPreferences")
+@MainActor
 struct PopSoundPreferencesTests {
     @Test("enabled defaults to true when key absent")
     func enabledDefaultsToTrue() throws {
@@ -204,15 +210,15 @@ struct PopSoundPreferencesTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let center = NotificationCenter.default
-        var saw = false
+        let saw = NotificationFlag()
         let token = center.addObserver(
             forName: .wedgePopSoundPreferencesDidChange,
             object: nil,
             queue: nil
-        ) { _ in saw = true }
+        ) { _ in saw.value = true }
         defer { center.removeObserver(token) }
 
         PopSoundPreferences.setEnabled(false, defaults: defaults)
-        #expect(saw)
+        #expect(saw.value)
     }
 }

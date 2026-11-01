@@ -3,6 +3,7 @@ import Testing
 @testable import wedge
 
 @Suite("LaunchAtLoginService")
+@MainActor
 struct LaunchAtLoginServiceTests {
     @Test("enableOnLaunch sets the one-shot did-request flag")
     func enableOnLaunchSetsDidRequestFlag() throws {

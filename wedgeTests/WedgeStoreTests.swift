@@ -3,6 +3,7 @@ import Testing
 @testable import wedge
 
 @Suite("WedgeStore")
+@MainActor
 struct WedgeStoreTests {
 
     @Test("first add becomes one thing")
