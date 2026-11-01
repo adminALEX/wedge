@@ -8,18 +8,28 @@ struct WedgeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        // Native Settings scene: the system installs Settings… with ⌘, in the app menu.
+        // Native Settings scene: the system installs Settings… with ⌘, in the app menu. The root
+        // reads the environment in its body, so declaring the scene doesn't build the environment.
         Settings {
-            SettingsView(environment: appDelegate.environment)
+            SettingsRoot(delegate: appDelegate)
         }
+    }
+}
+
+/// Reads `AppDelegate.environment` in its body, so declaring the Settings scene does not build it.
+private struct SettingsRoot: View {
+    let delegate: AppDelegate
+
+    var body: some View {
+        SettingsView(environment: delegate.environment)
     }
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let mode = LaunchMode.current()
     /// Built on first use, so a duplicate launch (which exits before touching it) never loads the
-    /// list or builds the panel. Construction starts nothing: `start()` creates the status item,
-    /// hotkeys and sound.
+    /// list or builds the panel; the Settings scene's root reads it in its body, not when the scene is built.
+    /// Construction starts nothing: `start()` creates the status item, hotkeys and sound.
     lazy var environment = AppEnvironment(mode: mode)
 
     override init() {
@@ -65,23 +75,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
-    /// If another copy of this app is running, asks Launch Services to reopen it (which shows its
-    /// panel via `applicationShouldHandleReopen`), quits this copy, and returns true.
+    /// If an older copy of this app is running (`SingleInstance`), asks Launch Services to reopen
+    /// it (which shows its panel via `applicationShouldHandleReopen`), quits this copy, and
+    /// returns true. The oldest copy returns false and keeps running.
     private func handOffToRunningInstance() -> Bool {
         guard let bundleID = Bundle.main.bundleIdentifier else { return false }
-        let me = ProcessInfo.processInfo.processIdentifier
+        let running = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
         guard
-            let other = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
-                .first(where: { $0.processIdentifier != me })
+            let target = SingleInstance.handOffTarget(
+                current: Self.copy(of: NSRunningApplication.current), running: running.map(Self.copy(of:))),
+            let other = running.first(where: { $0.processIdentifier == target.processID })
         else { return false }
         guard let url = other.bundleURL else {
             other.activate()
             NSApp.terminate(nil)
             return true
         }
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration()) { _, _ in
-            Task { @MainActor in NSApp.terminate(nil) }
+        Task { @MainActor in
+            do {
+                let configuration = NSWorkspace.OpenConfiguration()
+                _ = try await NSWorkspace.shared.openApplication(at: url, configuration: configuration)
+            } catch {
+                Log.panel.error("Couldn't reopen the running copy: \(error.localizedDescription, privacy: .public)")
+            }
+            NSApp.terminate(nil)
         }
         return true
+    }
+
+    private static func copy(of app: NSRunningApplication) -> SingleInstance.Copy {
+        SingleInstance.Copy(
+            processID: app.processIdentifier, launchDate: app.launchDate, isTerminated: app.isTerminated)
     }
 }

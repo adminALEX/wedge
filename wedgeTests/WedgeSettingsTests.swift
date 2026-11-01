@@ -28,6 +28,8 @@ struct WedgeSettingsTests {
         #expect(settings.customColorHex == nil)
         #expect(settings.playsSound == true)
         #expect(settings.customSoundFileName == nil)
+        #expect(settings.customSoundDisplayName == nil)
+        #expect(settings.customSoundLabel == nil)
     }
 
     @Test("every property round-trips through a fresh instance")
@@ -39,12 +41,14 @@ struct WedgeSettingsTests {
         settings.customColorHex = "#3366CC"
         settings.playsSound = false
         settings.customSoundFileName = "custom-done.wav"
+        settings.customSoundDisplayName = "Chime.wav"
 
         let reloaded = WedgeSettings(defaults: defaults)
         #expect(reloaded.isBold == true)
         #expect(reloaded.customColorHex == "#3366CC")
         #expect(reloaded.playsSound == false)
         #expect(reloaded.customSoundFileName == "custom-done.wav")
+        #expect(reloaded.customSoundDisplayName == "Chime.wav")
     }
 
     @Test("setting optional properties to nil clears them")
@@ -83,6 +87,32 @@ struct WedgeSettingsTests {
         #expect(defaults.string(forKey: "menuBar.colorHex") == "#112233")
         #expect(defaults.object(forKey: "done.playSound") as? Bool == false)
         #expect(defaults.string(forKey: "done.customSoundFile") == "custom-done.aiff")
+        settings.customSoundDisplayName = "Chime.aiff"
+        #expect(defaults.string(forKey: "done.customSoundName") == "Chime.aiff")
+    }
+
+    @Test("the custom sound shows the chosen file's name, and both clear with Use Default")
+    func customSoundLabel() throws {
+        let (defaults, cleanup) = try makeDefaults()
+        defer { cleanup() }
+        let settings = WedgeSettings(defaults: defaults)
+        settings.useCustomSound(fileName: "custom-done-1.mp3", displayName: "Chime.mp3")
+        #expect(settings.customSoundFileName == "custom-done-1.mp3")
+        #expect(settings.customSoundLabel == "Chime.mp3")
+
+        settings.useDefaultSound()
+        #expect(settings.customSoundFileName == nil)
+        #expect(settings.customSoundDisplayName == nil)
+        #expect(settings.customSoundLabel == nil)
+    }
+
+    @Test("a custom sound without a stored display name shows its file name")
+    func customSoundLabelFallsBackToFileName() throws {
+        let (defaults, cleanup) = try makeDefaults()
+        defer { cleanup() }
+        let settings = WedgeSettings(defaults: defaults)
+        settings.customSoundFileName = "custom-done.wav"
+        #expect(settings.customSoundLabel == "custom-done.wav")
     }
 
     @Test("changes are observable")

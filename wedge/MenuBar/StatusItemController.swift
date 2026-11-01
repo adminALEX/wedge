@@ -11,7 +11,7 @@ final class StatusItemController: NSObject {
     private let panel: PanelController
     private let hotkeys: HotkeyController
     private var statusItem: NSStatusItem?
-    /// After ⌥-click Done on mouseDown, ignore the matching mouseUp so the panel doesn't toggle.
+    /// After ⌥-click Done or ⌃-click menu on mouseDown, ignore the matching mouseUp so the panel doesn't toggle.
     private var suppressNextLeftMouseUp = false
     /// Whether the panel was showing when the current click began; decides what its mouseUp does.
     private var panelWasVisibleAtMouseDown = false
@@ -102,12 +102,18 @@ final class StatusItemController: NSObject {
         switch event.type {
         case .rightMouseDown:
             showMenu()
+        case .leftMouseDown where event.modifierFlags.contains(.control):
+            // Control-click is the Mac's secondary click: the same menu as a right click.
+            suppressNextLeftMouseUp = true
+            showMenu()
         case .leftMouseDown:
             if event.modifierFlags.contains(.option) {
                 // ⌥-click is Done; with nothing to complete it opens the panel instead.
                 suppressNextLeftMouseUp = true
                 if doneAction.perform() == nil { panel.show() }
             } else {
+                // Each mouseDown decides its mouseUp: a menu may have swallowed the last one.
+                suppressNextLeftMouseUp = false
                 // Clicking away from the panel hides it (resign key) around this very event.
                 panelWasVisibleAtMouseDown = panel.wasVisible(atEventTimestamp: event.timestamp)
             }

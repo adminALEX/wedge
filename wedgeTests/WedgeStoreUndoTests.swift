@@ -48,6 +48,17 @@ struct WedgeStoreUndoTests {
         }
     }
 
+    @Test func noOpDragKeepsUndoAndDoesNotSave() {
+        let p = InMemoryWedgePersistence(items: ["A", "B", "C"].map { WedgeItem(text: $0) })
+        let s = WedgeStore(persister: p)
+        s.completeNow()
+        let saves = p.saveCount
+        s.move(fromOffsets: IndexSet(integer: 0), toOffset: 1)  // onto itself
+        #expect(s.items.map(\.text) == ["B", "C"])
+        #expect(s.canUndoDone)
+        #expect(p.saveCount == saves)
+    }
+
     @Test func rejectedEditKeepsUndo() throws {
         let s = store(["A", "B"])
         s.completeNow()

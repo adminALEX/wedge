@@ -9,13 +9,10 @@ protocol DoneSoundPlaying: AnyObject {
     func load(customURL: URL?)
 }
 
-/// Keeps a prepared `AVAudioPlayer` so `play()` starts without load latency.
+/// Keeps a prepared `AVAudioPlayer` so `play()` starts without load latency. Silent until the
+/// first `load(customURL:)` (`DoneSoundLoader` calls it at start).
 final class DoneSoundPlayer: DoneSoundPlaying {
     private var player: AVAudioPlayer?
-
-    init() {
-        load(customURL: nil)
-    }
 
     func play() {
         guard let player else { return }

@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 /// Where keyboard focus is in the panel.
 enum PanelFocus: Hashable {
@@ -135,11 +136,21 @@ struct PanelView: View {
     }
 
     /// Lets the completed row pop, then removes it so the next row rises. A newer Done cancels
-    /// this task and starts its own, so the moment restarts from the new state.
+    /// this task and starts its own, so the moment restarts from the new state. The
+    /// "DoneAnimation" signpost runs from the Done's arrival until the rise settles.
     private func riseAfterPop() async {
         guard let id = doneAction.lastEvent?.id, id != settledEventID, animatesDone else { return }
-        do { try await Task.sleep(for: DoneMoment.popDuration) } catch { return }
-        withAnimation(DoneMoment.rise) { settledEventID = id }
+        let interval = Log.signposter.beginInterval("DoneAnimation")
+        do {
+            try await Task.sleep(for: DoneMoment.popDuration)
+            withAnimation(DoneMoment.rise) {
+                settledEventID = id
+            } completion: {
+                Log.signposter.endInterval("DoneAnimation", interval)
+            }
+        } catch {
+            Log.signposter.endInterval("DoneAnimation", interval)
+        }
     }
 
     /// Hides "Undo Done ⌘Z" 4 s after it appears (sooner if undo is no longer possible).
@@ -176,20 +187,5 @@ struct PanelView: View {
         guard let last = store.items.last else { return }
         selection = last.id
         focus = .list
-    }
-}
-
-/// The small section label ("Now", "Up Next").
-struct SectionLabel: View {
-    let text: String
-
-    init(_ text: String) {
-        self.text = text
-    }
-
-    var body: some View {
-        Text(text)
-            .font(.caption.weight(.medium))
-            .foregroundStyle(.secondary)
     }
 }

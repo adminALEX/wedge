@@ -22,9 +22,11 @@ struct LoginItemRow: View {
                 Button(WedgeCopy.openLoginItems) { SMAppService.openSystemSettingsLoginItems() }
             }
         }
-        // Returning from System Settings (where the user may have approved) refreshes the state.
+        // Returning from System Settings (where the user may have approved or fixed it) refreshes
+        // the state and drops a stale failure message.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             state = LaunchAtLoginService.state
+            changeFailed = false
         }
     }
 

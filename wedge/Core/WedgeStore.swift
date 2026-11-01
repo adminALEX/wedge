@@ -70,8 +70,12 @@ final class WedgeStore {
         commit()
     }
 
+    /// A drag that ends where it started changes nothing: no save, and Undo Done stays available.
     func move(fromOffsets offsets: IndexSet, toOffset offset: Int) {
-        items.move(fromOffsets: offsets, toOffset: offset)
+        var moved = items
+        moved.move(fromOffsets: offsets, toOffset: offset)
+        guard moved != items else { return }
+        items = moved
         commit()
     }
 
@@ -120,6 +124,8 @@ final class WedgeStore {
     private func commit(keepingUndo: Bool = false) {
         if !keepingUndo { lastDone = nil }
         guard issue != .loadFailed else { return }
+        let interval = Log.signposter.beginInterval("Save")
+        defer { Log.signposter.endInterval("Save", interval) }
         do {
             try persister.save(items)
             if issue == .saveFailed || issue == .recoveredFromCorruptFile { issue = nil }

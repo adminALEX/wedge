@@ -15,6 +15,7 @@ final class AppEnvironment {
     let panel: PanelController
     let statusItem: StatusItemController
     let hotkeys: HotkeyController
+    private let soundLoader: DoneSoundLoader
     private let showsPanelAtStart: Bool
 
     init(mode: LaunchMode) {
@@ -48,13 +49,15 @@ final class AppEnvironment {
             content: PanelView(store: store, doneAction: doneAction, announce: announce)
         )
         let hotkeys = HotkeyController(panel: panel, doneAction: doneAction)
+        let soundStore = CustomSoundStore(directory: directory)
 
         self.store = store
         self.settings = settings
         self.sound = sound
         self.doneAction = doneAction
         self.announce = announce
-        self.soundStore = CustomSoundStore(directory: directory)
+        self.soundStore = soundStore
+        self.soundLoader = DoneSoundLoader(settings: settings, soundStore: soundStore, sound: sound)
         self.panel = panel
         self.hotkeys = hotkeys
         self.showsPanelAtStart = LaunchMode.showsPanelAtStart(mode)
@@ -63,21 +66,11 @@ final class AppEnvironment {
         )
     }
 
+    /// The status item comes first, so Wedge is visible as early as possible; the sound loads once, here.
     func start() {
-        loadSoundAndObserve()
-        hotkeys.start()
         statusItem.start()
+        soundLoader.start()
+        hotkeys.start()
         if showsPanelAtStart { panel.show() }
-    }
-
-    /// Loads the chosen sound now and again whenever the custom file changes; re-armed after each change.
-    private func loadSoundAndObserve() {
-        let fileName = withObservationTracking {
-            settings.customSoundFileName
-        } onChange: { [weak self] in
-            // onChange runs before the new value lands; hop a turn so the reload sees it.
-            Task { @MainActor [weak self] in self?.loadSoundAndObserve() }
-        }
-        sound.load(customURL: soundStore.url(for: fileName))
     }
 }

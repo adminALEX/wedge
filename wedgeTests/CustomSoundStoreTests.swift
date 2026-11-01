@@ -28,7 +28,7 @@ struct CustomSoundStoreTests {
         let store = CustomSoundStore(directory: tmp.appendingPathComponent("Support", isDirectory: true))
 
         let name = try await store.install(from: source)
-        #expect(name == "custom-done.wav")
+        #expect(name.hasPrefix("custom-done-") && name.hasSuffix(".wav"))
         #expect(store.url(for: name) != nil)
 
         store.remove(fileName: name)
@@ -43,7 +43,7 @@ struct CustomSoundStoreTests {
         try TestAudioFixtures.writeSilenceWAV(to: source, seconds: 3.0)
         let store = CustomSoundStore(directory: tmp.appendingPathComponent("Support", isDirectory: true))
 
-        #expect(try await store.install(from: source) == "custom-done.wav")
+        #expect(try await store.install(from: source).hasSuffix(".wav"))
     }
 
     @Test("rejects a sound longer than three seconds and installs nothing")
@@ -87,6 +87,26 @@ struct CustomSoundStoreTests {
         }
     }
 
+    @Test("two installs with the same extension get different names")
+    func sameExtensionGetsANewName() async throws {
+        let tmp = try makeTempDirectory()
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        let first = tmp.appendingPathComponent("A.wav")
+        let second = tmp.appendingPathComponent("B.wav")
+        try TestAudioFixtures.writeSilenceWAV(to: first, seconds: 0.2)
+        try TestAudioFixtures.writeSilenceWAV(to: second, seconds: 0.4)
+        let support = tmp.appendingPathComponent("Support", isDirectory: true)
+        let store = CustomSoundStore(directory: support)
+
+        let firstName = try await store.install(from: first)
+        let secondName = try await store.install(from: second)
+
+        #expect(firstName != secondName)
+        #expect(store.url(for: firstName) == nil)
+        #expect(store.url(for: secondName) != nil)
+        #expect(try customFiles(in: support) == [secondName])
+    }
+
     @Test("install replaces the previous custom file, even one of another type")
     func installReplacesPrevious() async throws {
         let tmp = try makeTempDirectory()
@@ -101,12 +121,12 @@ struct CustomSoundStoreTests {
         let store = CustomSoundStore(directory: support)
 
         _ = try await store.install(from: first)
-        _ = try await store.install(from: second)
+        let name = try await store.install(from: second)
 
-        #expect(try customFiles(in: support) == ["custom-done.wav"])
+        #expect(try customFiles(in: support) == [name])
     }
 
-    @Test("reinstalling the current custom file keeps it")
+    @Test("reinstalling the current custom file keeps one copy of it")
     func reinstallCurrentFile() async throws {
         let tmp = try makeTempDirectory()
         defer { try? FileManager.default.removeItem(at: tmp) }
@@ -118,8 +138,9 @@ struct CustomSoundStoreTests {
         let name = try await store.install(from: source)
         let again = try await store.install(from: try #require(store.url(for: name)))
 
-        #expect(again == name)
-        #expect(try customFiles(in: support) == ["custom-done.wav"])
+        #expect(again != name)
+        #expect(store.url(for: again) != nil)
+        #expect(try customFiles(in: support) == [again])
     }
 
     @Test("url(for:) is nil for nil, blank, and missing names")

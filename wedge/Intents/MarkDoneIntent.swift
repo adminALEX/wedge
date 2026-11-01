@@ -14,12 +14,13 @@ struct MarkDoneIntent: AppIntent {
         return .result(value: message, dialog: IntentDialog(stringLiteral: message))
     }
 
-    /// Returns the Done announcement, or "Nothing to mark done." on an empty list.
+    /// Returns the Done announcement (plus the banner text when the change won't be saved), or
+    /// "Nothing to mark done." on an empty list.
     @MainActor
     static func run(doneAction: DoneAction, store: WedgeStore) -> String {
         guard store.now != nil, let event = doneAction.perform() else {
             return WedgeCopy.nothingToMarkDone
         }
-        return DoneAction.announcement(for: event)
+        return IntentReply.afterChange(DoneAction.announcement(for: event), store: store)
     }
 }

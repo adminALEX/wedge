@@ -10,7 +10,7 @@ Wedge is free and open source. It requires **macOS 26 Tahoe** or later.
 
 ## Install
 
-1. Download the latest `.zip` or `.dmg` from [Releases](https://github.com/adminALEX/wedge/releases).
+1. Download the latest `.zip` from [Releases](https://github.com/adminALEX/wedge/releases) and open it to unzip Wedge.
 2. Move Wedge to Applications and open it. It lives in the menu bar and has no Dock icon.
 3. If the menu-bar item is hidden (a crowded bar, or the notch), open Wedge again from Applications or Spotlight. That opens the panel.
 

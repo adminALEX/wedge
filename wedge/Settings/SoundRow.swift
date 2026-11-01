@@ -16,7 +16,7 @@ struct SoundRow: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(WedgeCopy.sound)
-                Text(settings.customSoundFileName ?? WedgeCopy.defaultSoundName)
+                Text(settings.customSoundLabel ?? WedgeCopy.defaultSoundName)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -40,8 +40,8 @@ struct SoundRow: View {
     }
 
     private func useDefault(replacing fileName: String) {
+        settings.useDefaultSound()
         soundStore.remove(fileName: fileName)
-        settings.customSoundFileName = nil
         errorMessage = nil
     }
 
@@ -54,7 +54,8 @@ struct SoundRow: View {
         guard panel.runModal() == .OK, let url = panel.url else { return }
         Task {
             do {
-                settings.customSoundFileName = try await soundStore.install(from: url)
+                let fileName = try await soundStore.install(from: url)
+                settings.useCustomSound(fileName: fileName, displayName: url.lastPathComponent)
                 errorMessage = nil
             } catch {
                 let message = WedgeCopy.soundMessage(for: error)

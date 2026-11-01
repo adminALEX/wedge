@@ -5,7 +5,7 @@
 
 import Foundation
 import ServiceManagement
-import os.log
+import os
 
 /// What Settings needs to tell apart: on, off, or registered but waiting for the user in System Settings.
 enum LoginItemState: Equatable {
@@ -13,10 +13,8 @@ enum LoginItemState: Equatable {
 }
 
 enum LaunchAtLoginService {
-    private static let log = Logger(subsystem: "com.xela.wedge", category: "LaunchAtLogin")
-
     /// UserDefaults flag recording that we already asked for the login item once.
-    static let didRequestKey = "wedge.didRequestLoginItem"
+    static let didRequestKey = "loginItem.didRequest"
 
     static func state(for status: SMAppService.Status) -> LoginItemState {
         switch status {
@@ -55,7 +53,7 @@ enum LaunchAtLoginService {
         do {
             try service.register()
         } catch {
-            log.error("Failed to register login item: \(error.localizedDescription, privacy: .private)")
+            Log.settings.error("Failed to register login item: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

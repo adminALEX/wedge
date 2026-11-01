@@ -15,9 +15,11 @@ enum StatusItemTitle {
         now.map { WedgeCopy.statusItemNow($0.text) } ?? WedgeCopy.statusItemNothingNow
     }
 
+    /// The menu-bar font at its own size, so the title lines up with neighbouring items (§10.4).
     static func attributes(isBold: Bool, colorHex: String?) -> [NSAttributedString.Key: Any] {
-        [
-            .font: isBold ? NSFont.boldSystemFont(ofSize: NSFont.systemFontSize) : NSFont.menuBarFont(ofSize: 0),
+        let menuBarFont = NSFont.menuBarFont(ofSize: 0)
+        return [
+            .font: isBold ? NSFont.systemFont(ofSize: menuBarFont.pointSize, weight: .bold) : menuBarFont,
             .foregroundColor: colorHex.flatMap { NSColor(hex: $0) } ?? NSColor.labelColor,
         ]
     }

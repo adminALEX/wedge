@@ -33,6 +33,11 @@ struct LaunchAtLoginServiceTests {
         #expect(defaults.bool(forKey: LaunchAtLoginService.didRequestKey) == true)
     }
 
+    @Test("the did-request flag uses the settings key namespace")
+    func didRequestKeyName() {
+        #expect(LaunchAtLoginService.didRequestKey == "loginItem.didRequest")
+    }
+
     @Test("service status maps to the three states Settings distinguishes")
     func statusMapping() {
         #expect(LaunchAtLoginService.state(for: .enabled) == .enabled)

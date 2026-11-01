@@ -48,7 +48,35 @@ struct IntentsTests {
         #expect(list.items.map(\.text) == ["A", "B"])
     }
 
+    @Test func addAppendsTheBannerWhenTheSaveFails() throws {
+        let persister = InMemoryWedgePersistence(items: [WedgeItem(text: "A")])
+        persister.failSaves = true
+        let list = WedgeStore(persister: persister)
+        #expect(
+            try AddToUpNextIntent.run(text: "B", store: list)
+                == "Added to Up Next. Couldn't save. Your latest changes may be lost.")
+    }
+
+    @Test func addAppendsTheBannerWhenTheListCouldNotBeRead() throws {
+        let list = WedgeStore(persister: FailingLoadPersistence(error: CocoaError(.fileReadUnknown)))
+        #expect(list.issue == .loadFailed)
+        #expect(
+            try AddToUpNextIntent.run(text: "A", store: list)
+                == "Now: A Couldn't read your list. Changes won't be saved until Wedge can read it.")
+    }
+
     // MARK: Mark Done
+
+    @Test func markDoneAppendsTheBannerWhenTheSaveFails() throws {
+        let persister = InMemoryWedgePersistence(items: ["A", "B"].map { WedgeItem(text: $0) })
+        persister.failSaves = true
+        let list = WedgeStore(persister: persister)
+        let (action, cleanup) = try doneAction(for: list)
+        defer { cleanup() }
+        #expect(
+            MarkDoneIntent.run(doneAction: action, store: list)
+                == "Done. Now: B Couldn't save. Your latest changes may be lost.")
+    }
 
     @Test func markDoneAnnouncesTheNextItem() throws {
         let list = store(["A", "B"])

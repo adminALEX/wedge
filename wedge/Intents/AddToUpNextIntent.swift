@@ -16,13 +16,15 @@ struct AddToUpNextIntent: AppIntent {
         return .result(value: message, dialog: IntentDialog(stringLiteral: message))
     }
 
-    /// Returns "Now: ‹text›" when the item became Now, else "Added to Up Next."; throws the panel's message on invalid text.
+    /// Returns "Now: ‹text›" when the item became Now, else "Added to Up Next." (plus the banner text
+    /// when the change won't be saved); throws the panel's message on invalid text.
     @MainActor
     static func run(text: String, store: WedgeStore) throws -> String {
         let wasEmpty = store.items.isEmpty
         do {
             let item = try store.add(text)
-            return wasEmpty ? WedgeCopy.nowIs(item.text) : WedgeCopy.addedToUpNext
+            let message = wasEmpty ? WedgeCopy.nowIs(item.text) : WedgeCopy.addedToUpNext
+            return IntentReply.afterChange(message, store: store)
         } catch {
             throw WedgeIntentError(message: WedgeCopy.message(for: error))
         }

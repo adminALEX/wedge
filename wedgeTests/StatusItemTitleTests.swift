@@ -22,9 +22,11 @@ struct StatusItemTitleTests {
         #expect(StatusItemTitle.accessibilityLabel(now: nil) == "Wedge, nothing now")
     }
 
-    @Test func boldUsesBoldSystemFont() {
+    @Test func boldUsesBoldSystemFontAtMenuBarSize() {
         let attributes = StatusItemTitle.attributes(isBold: true, colorHex: nil)
-        #expect(attributes[.font] as? NSFont == NSFont.boldSystemFont(ofSize: NSFont.systemFontSize))
+        let menuBarSize = NSFont.menuBarFont(ofSize: 0).pointSize
+        #expect(attributes[.font] as? NSFont == NSFont.systemFont(ofSize: menuBarSize, weight: .bold))
+        #expect((attributes[.font] as? NSFont)?.pointSize == menuBarSize)
     }
 
     @Test func regularUsesMenuBarFont() {
