@@ -3,7 +3,8 @@ import Observation
 import os
 import SwiftUI
 
-/// Owns the panel and its hosting view (both created once) and positions it under the status item.
+/// Owns the panel and its hosting view (both created once) and positions it under the status item,
+/// sized to the content's height (and resized while open as the content grows or shrinks).
 @Observable
 final class PanelController {
     private(set) var isVisible = false
@@ -26,13 +27,19 @@ final class PanelController {
         panel.contentView = hostingView
         panel.onDismiss = { [weak self] in self?.hide() }
         hostingView.rootView = AnyView(
-            PanelRoot(content: content) { [weak self] action in
-                self?.openSettings = {
-                    NSApp.activate()
-                    action()
+            content
+                .background {
+                    SettingsOpener { [weak self] action in
+                        self?.openSettings = {
+                            NSApp.activate()
+                            action()
+                        }
+                    }
                 }
-            }
-            .environment(self)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { [weak self] height in
+                    self?.contentHeightChanged(to: height)
+                }
+                .environment(self)
         )
         // Lay out now so the hosted `SettingsOpener` has appeared before the first show.
         hostingView.layoutSubtreeIfNeeded()
@@ -47,17 +54,10 @@ final class PanelController {
         let interval = Log.signposter.beginInterval("PanelOpen")
         defer { Log.signposter.endInterval("PanelOpen", interval) }
 
-        let item = itemFrameProvider()
-        guard let visibleFrame = (item?.screen ?? Self.screenUnderMouse())?.visibleFrame else {
-            Log.panel.error("No screen available to show the panel")
+        hostingView.layoutSubtreeIfNeeded()
+        guard place(height: hostingView.fittingSize.height, fallbackScreen: Self.screenUnderMouse()) else {
             return
         }
-        hostingView.layoutSubtreeIfNeeded()
-        let size = CGSize(width: PanelAnchor.width, height: hostingView.fittingSize.height)
-        panel.setFrame(
-            PanelAnchor.frame(panelSize: size, itemFrame: item?.frame, visibleFrame: visibleFrame),
-            display: true
-        )
         isVisible = true
         panel.makeKeyAndOrderFront(nil)
         installOutsideClickMonitor()
@@ -69,6 +69,26 @@ final class PanelController {
         lastHiddenAt = ProcessInfo.processInfo.systemUptime
         removeOutsideClickMonitor()
         panel.orderOut(nil)
+    }
+
+    /// Content grew or shrank while open (rows added or removed): keep the panel under the item.
+    private func contentHeightChanged(to height: CGFloat) {
+        guard isVisible else { return }
+        place(height: height, fallbackScreen: panel.screen)
+    }
+
+    /// Sizes and anchors the panel under the status item. False when there is no screen.
+    @discardableResult
+    private func place(height: CGFloat, fallbackScreen: NSScreen?) -> Bool {
+        let item = itemFrameProvider()
+        guard let visibleFrame = (item?.screen ?? fallbackScreen)?.visibleFrame else {
+            Log.panel.error("No screen available to show the panel")
+            return false
+        }
+        let size = CGSize(width: PanelAnchor.width, height: height)
+        let frame = PanelAnchor.frame(panelSize: size, itemFrame: item?.frame, visibleFrame: visibleFrame)
+        if panel.frame != frame { panel.setFrame(frame, display: true) }
+        return true
     }
 
     /// Clicks on other apps' windows or menu-bar extras don't always take key from the panel,
@@ -99,33 +119,5 @@ final class PanelController {
 
     private static func screenUnderMouse() -> NSScreen? {
         NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) } ?? NSScreen.main
-    }
-}
-
-/// Interim panel chrome around the hosted content (replaced when the panel view is rebuilt).
-private struct PanelRoot<Content: View>: View {
-    let content: Content
-    let onOpenSettings: (OpenSettingsAction) -> Void
-
-    private let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
-
-    var body: some View {
-        content
-            .frame(width: PanelAnchor.width, height: 340)
-            .background(.regularMaterial, in: shape)
-            .clipShape(shape)
-            .background { SettingsOpener(onCapture: onOpenSettings) }
-    }
-}
-
-/// Zero-size view that hands the SwiftUI `openSettings` action to AppKit callers.
-private struct SettingsOpener: View {
-    @Environment(\.openSettings) private var openSettings
-    let onCapture: (OpenSettingsAction) -> Void
-
-    var body: some View {
-        Color.clear
-            .frame(width: 0, height: 0)
-            .onAppear { onCapture(openSettings) }
     }
 }

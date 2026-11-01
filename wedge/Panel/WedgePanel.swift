@@ -24,6 +24,7 @@ final class WedgePanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 
+    /// Esc. An inline edit consumes Esc itself (cancelling the edit), so it never gets here.
     override func cancelOperation(_ sender: Any?) {
         onDismiss()
     }

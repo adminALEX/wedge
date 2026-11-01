@@ -45,14 +45,7 @@ final class AppEnvironment {
             sound: sound,
             announce: { AccessibilityNotification.Announcement($0).post() }
         )
-        let panel = PanelController(
-            content: PopoverContentView(
-                store: store,
-                doneAction: doneAction,
-                onChange: {},  // the status item observes the store itself
-                onDone: { doneAction.perform() }
-            )
-        )
+        let panel = PanelController(content: PanelView(store: store, doneAction: doneAction))
         let hotkeys = HotkeyController(panel: panel, doneAction: doneAction)
 
         self.store = store

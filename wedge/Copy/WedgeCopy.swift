@@ -8,14 +8,36 @@ enum WedgeCopy {
     // Product verbs / nouns (canonical language)
     static let done = "Done"
     static let oneThing = "one thing"
-    static let upNext = "Up next"
+    static let now = "Now"
+    static let upNext = "Up Next"
     static let delete = "Delete"
 
     // Panel
-    static let addOneThingPlaceholder = "What's your one thing?"
-    static let addUpNextPlaceholder = "Add to up next…"
-    static let itemFieldAccessibility = "Item"
-    static let dragToReorder = "Drag to reorder"
+    static let addNowPlaceholder = "What are you on now?"
+    static let addUpNextPlaceholder = "Add to Up Next…"
+    static let panelHint = "⌘↩ Done · ⌘, Settings"
+    static let maxCharacters = "40 characters max"
+    static let cantBeEmpty = "Can't be empty"
+    static let moveUp = "Move Up"
+    static let moveDown = "Move Down"
+    static func nowAccessibility(_ title: String) -> String { "\(now), \(title)" }
+    static func doneAccessibility(_ title: String) -> String { "\(done), \(title)" }
+    static func rowAccessibility(_ position: Int, of count: Int, _ title: String) -> String {
+        "\(position) of \(count), \(title)"
+    }
+    static func movedTo(_ position: Int) -> String { "Moved to \(position)" }
+    /// Inline message for a rejected add or edit (the store only throws `WedgeStoreError`).
+    static func message(for error: any Error) -> String {
+        switch error as? WedgeStoreError {
+        case .textTooLong: maxCharacters
+        case .emptyText, nil: cantBeEmpty
+        }
+    }
+
+    // Panel — store issues
+    static let saveFailed = "Couldn't save. Your latest changes may be lost."
+    static let recoveredFromCorruptFile = "Couldn't read your list. A copy was saved in Application Support."
+    static let loadFailed = "Couldn't read your list. Changes won't be saved until Wedge can read it."
 
     // Status item / menu
     static let settingsMenu = "Settings…"
