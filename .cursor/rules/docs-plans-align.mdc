@@ -11,7 +11,7 @@ alwaysApply: true
 |-----|------|
 | Overview | `docs/product/overview.md` |
 | Roadmap | `docs/product/roadmap.md` |
-| Phases | `docs/product/phases/v1.md`, `v2.md`, `v3.md` |
+| History (not updated) | `docs/product/history/v1.md`, `v2.md`, `v3.md` |
 | Agent product rule | `.cursor/rules/wedge-product.mdc` |
 
 ## Skill map
@@ -26,10 +26,10 @@ alwaysApply: true
 ## When the user confirms a product or scope change
 
 1. Update the matching `docs/product/` file(s).
-2. Update `.cursor/rules/wedge-product.mdc` if v1 behavior/language/horizon changed.
+2. Update `.cursor/rules/wedge-product.mdc` if behavior, language or scope changed.
 3. Do not leave rules contradicting docs.
 
 ## Do not
 
-- Add v4, cloud/sync, or Dock-mode features to docs without explicit user confirmation.
-- Invent truncation/higher char limits into a phase until discussed (v1 stays at 40, no truncation).
+- Add cloud/sync, Dock-mode or any new feature to docs without explicit user confirmation and a design doc (see "Focused by default" in `docs/product/overview.md`).
+- Invent truncation or higher character limits until discussed (the 40-character cap stays, no truncation).

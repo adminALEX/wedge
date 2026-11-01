@@ -6,10 +6,15 @@ alwaysApply: false
 
 # macOS menu bar
 
-- Ship as **accessory / LSUIElement** — no Dock, no Cmd-Tab app window for v1.
-- Status item: left click = floating panel (toggle); right click = native menu (Done, Settings…, Quit); ⌥+click = Done when a one thing exists.
-- Prefer SwiftUI for panel content; use AppKit for NSStatusItem, NSPanel, sound, etc. Do not use a transient `NSPopover` for the main UI (text editing breaks).
-- Keep the panel small and power-user oriented — minimal chrome. Settings via native **⌘,** / **Settings…** (SwiftUI `Settings` scene; status-item menu uses the system Settings action).
-- Panel window title is **Wedge** (system title bar); no in-content app title or Done button — Done is ⌘↩ / status-item shortcuts.
-- List rows show an always-visible Notion-style **6-dot grip**; reorder via `List`/`onMove`.
-- While panel/Settings is open, switch to `.regular` so the app menu exists; return to `.accessory` when idle.
+- Ship as **accessory / LSUIElement**. No Dock icon, no Cmd-Tab entry, no Window menu entry. **Never change activation policy**: do not switch to `.regular` while the panel or Settings is open.
+- Status item: left click toggles the panel; ⌥-click is Done (an empty list opens the panel); right click opens a native menu (Done with its shortcut, Undo Done when available, Settings…, Quit Wedge). Set `autosaveName`. Rebuild title attributes only when the Now item or appearance settings change, never on a timer.
+- The panel is a borderless, **non-activating** `NSPanel` (glass material), 320 pt wide, anchored under the status item on the display whose menu bar was clicked. No title bar and no window title text. When the status item has no visible frame, fall back to the top-right of the active screen under the menu bar. It joins all Spaces and works over full-screen apps.
+- Panel content is SwiftUI inside AppKit. AppKit owns `NSStatusItem`, `NSPanel`, sound and key handling at the window level. Do not use a transient `NSPopover`.
+- Now is row 1 of the same `List` as Up Next. Rows drag by their whole body; there are no grip dots. One `.onMove` handles reordering, and dragging to the top makes the row Now. ⌥⌘↑/↓ and VoiceOver custom actions (Move Up, Move Down) reorder without a pointer.
+- Esc goes to the editing field first, through the window-level cancel hook; it closes the panel only when nothing is being edited. Hiding the panel any other way commits an edit.
+- Settings is the native SwiftUI `Settings` scene, one grouped `Form`; ⌘, and Settings… use the system action.
+- One `AppEnvironment` composition root owns store, settings, persister, sound player and controllers. No singletons and no `.standard` defaults reached from views. Unit-test hosts and UI-test launches get an inert in-memory environment: no status item, hotkeys, login item or panel.
+- A second launch activates the running instance, opens its panel and exits. Reopen (`applicationShouldHandleReopen`) opens the panel too.
+- Login item: `SMAppService.mainApp`; show a failure inline with an Open Login Items button. Hotkeys: KeyboardShortcuts. Sound: preloaded `AVAudioPlayer`.
+- Accessibility: follow light/dark, Reduce Motion, Reduce Transparency and Increase Contrast; use system semantic colours. Every control is reachable with Tab and shows a focus ring. After Done, VoiceOver announces "Done. Now: ‹title›".
+- Logging with `os.Logger` (item text private) and signposts for panel open, Done and save. No network code, analytics or crash-reporting SDKs.

@@ -1,49 +1,48 @@
 ---
-description: Wedge product path — v1–v3 shipped; horizon v1–v3 only
+description: Wedge product rules — Wedge 1.0 is current; focused by default
 alwaysApply: true
 ---
 
-# Wedge product path
+# Wedge product
 
-Canonical docs: `docs/product/overview.md`, `docs/product/roadmap.md`, `docs/product/phases/v*.md`.
+Canonical docs: `docs/product/overview.md`, `docs/product/roadmap.md`. Earlier phases are history in `docs/product/history/` and are not updated. Design spec: `docs/superpowers/specs/2026-11-01-wedge-1.0-redesign-design.md`.
 
 ## What Wedge is
 
-macOS **menu-bar only** utility (OneThing-adjacent). **Requires macOS 15 Sequoia** or later. The bar shows the **one thing** (list index 0). Everything else is **Up next**, ordered by drag. Position = priority — no priority fields. **Done** (pop + sound) is the emotional core.
+macOS **menu-bar only** app (no Dock, no Cmd-Tab). **Requires macOS 26 Tahoe**; no fallbacks for older systems. The bar shows **Now** (list index 0). Everything below is **Up Next**, in order. Position is priority: no priority fields, tags or multiple lists. **Done** is the one moment with motion and sound.
 
 ## Language
 
-**one thing** · **Up next** · **Done** — not push/pop/stack/P0. Empty bar: **icon only**. Non-empty: **title only** (no circle).
+**Now** · **Up Next** · **Done** (title case as labels). Shortcut names: **Show Wedge** · **Done**. Menu: Done · Undo Done · Settings… · Quit Wedge.
 
-UI copy constants: `wedge/Copy/WedgeCopy.swift` (change naming in one place).
+Words to avoid: "one thing", OneThing, Focus, Spotlight (for Wedge's own concepts), Today, On Deck, Priority, Pinned, push, pop, stack, P0/P1. "Pop" is an internal name only; the UI says **Done sound** and **Pop (default)** for the bundled sound.
 
-## Horizon
+Voice: quiet and plain. No praise, no emoji, no exclamation marks, no OS-version caveats in UI copy. Every failure is a short inline message; never `NSSound.beep()`. Never compare Wedge to other apps in docs, UI or code.
 
-**v1 → v2 → v3 only** (all shipped). No v4. No cloud/sync/accounts. No Dock mode. No confetti.
+Empty bar: the Wedge glyph (template image). Non-empty: the Now item's title only.
 
-## v1 (shipped)
+All UI strings come from the String Catalog through `WedgeCopy` (`wedge/Copy/WedgeCopy.swift`). Add new copy there, not as literals in views. Code names follow the UI noun (`NowHeader`).
 
-- Compact floating **panel** on left click (centered on screen, add field focused; window title **Wedge**); single list with Notion-style **6-dot drag grips**; add always to bottom of Up next.
-- Inline edit: tap row text → focused `TextField` (not always-on fields inside `List`).
-- Done: ⌘↩ (panel key), ⌥+click, right-click menu (no Force-click; no panel Done button).
-- Persist locally. **Launch at login.**
-- **Max 40 characters** per item; enforce limit; **no truncation/ellipsis logic**.
-- **Minimal Settings:** native **⌘,** / **Settings…**. Menu-bar one-thing **bold** + **color**.
-- See `docs/product/phases/v1.md`. Tag: **v1.0.0**.
+## Behaviour rules
 
-## v2 (shipped)
+- **Panel:** borderless, non-activating glass panel anchored under the status item, 320 pt wide. Opens with the add field focused. Closes on ⌃⌥W, Esc (only when not editing) or click outside.
+- **List:** Now is row 1 of the same list as Up Next. Dragging a row to the top makes it Now (no Done animation). Adds go to the bottom; the first item becomes Now. **Max 40 characters**; no truncation.
+- **Edit:** click row text, or ↩ on a selected row. ↩ saves; Esc cancels the edit before it ever closes the panel; click elsewhere saves.
+- **Done:** one `DoneAction` for every entry point (ring, ⌘↩, ⌥-click, menu, ⌃⌥D, the Mark Done intent). With the panel hidden: menu-bar swap, bump and sound only, and no undo hint later. Reduce Motion: instant swap plus sound.
+- **Undo Done** (⌘Z, menu) restores the last Done item to the top until the next list mutation. Deletes are not undoable.
+- **Keys:** ⌃⌥W Show Wedge and ⌃⌥D Done are the defaults, both remappable. In the panel: ↑/↓ select, ↩ edit, ⌘↩ Done, ⌫ delete, ⌥⌘↑/↓ move, ⌘Z undo, ⌘, Settings.
+- **Errors:** save failure, damaged file (copy kept) and unreadable file each show a banner in the panel. After an unreadable file, saving stays off for the rest of the run so the file is never overwritten.
+- **Settings:** one page. Menu Bar (Bold, Color), Done (Play sound, Sound, ≤ 3 s custom file), Keyboard, Open at login, About.
+- **App Intents:** Add to Up Next, Mark Done, Get Now. Phrases: "Add to Up Next in Wedge", "Mark Done in Wedge", "What's Now in Wedge". Dependencies are registered in `AppDelegate.init`.
+- **Privacy:** no network access, no analytics, no update check. The sandbox has no network entitlement. The privacy manifest declares the UserDefaults and system-boot-time required-reason APIs and no data collection. Do not add a dependency or entitlement that changes this.
+- **Storage:** `Application Support/Wedge/wedge.json` (versioned, atomic writes) inside the app's sandbox container. `UserDefaults` holds preferences only.
 
-- Global hotkeys: defaults **⌃⌥W** toggle panel, **⌃⌥D** Done; **remappable in Settings**.
-- Denser panel keyboard: list selection ↑/↓, ⌫ delete selected when not editing.
-- See `docs/product/phases/v2.md`. Tag: **v2.0.0**.
+## Focused by default
 
-## v3 (shipped)
+Bug fixes, OS updates and polish ship freely. A new feature is added only by deliberate decision, with its own short design doc, and only if it fits the core rules: one item Now, order is priority, menu-bar only, local only.
 
-- **Pop sound:** on/off (default on; Done silent when off); optional custom file ≤ **3 s** (Choose… / Use default / Preview).
-- **Launch at login:** Settings toggle (General).
-- Status-item menu shows remappable Done shortcut.
-- See `docs/product/phases/v3.md`. Tag: **v3.0.0**.
+Out of product (today's decisions): sync, iCloud, accounts, Dock mode, confetti, priority fields, tags or multiple lists, in-app updater, Mac App Store build, undo for anything but Done.
 
 ## Alignment
 
-On any confirmed product change, update the matching phase doc + this rule (`wedge-keep-aligned`). Do not invent v4 without explicit confirmation.
+On any confirmed product change, update `docs/product/overview.md`, `docs/product/roadmap.md` and this rule together. Do not list a post-1.0 candidate until the decision and its design doc exist.

@@ -1,29 +1,45 @@
-# Wedge — Phased roadmap
+# Wedge — Roadmap
 
-Product horizon: **v1 → v2 → v3 only**. No v4. No cloud/sync.
+**Current: Wedge 1.0** — requires macOS 26 Tahoe. See [overview.md](overview.md) for the product and the design spec at [../superpowers/specs/2026-11-01-wedge-1.0-redesign-design.md](../superpowers/specs/2026-11-01-wedge-1.0-redesign-design.md) for how it is built.
 
-Plans and rules must stay aligned with this file and the phase docs when scope is confirmed or changed (`wedge-keep-aligned`).
+Wedge 1.0 supersedes the earlier "v1 to v3 only" horizon. The earlier phases remain as history and are the requirements baseline that 1.0 kept.
 
-| Phase | Status | Summary | Doc |
-|-------|--------|---------|-----|
-| **v1** | Shipped | Core menu-bar Wedge + panel, Settings, launch at login + 40-char limit | [phases/v1.md](phases/v1.md) · [implementation plan](../superpowers/plans/2026-08-16-wedge-v1.md) (historical) |
-| **v2** | Shipped | Global hotkeys (⌃⌥W / ⌃⌥D defaults) + remapping in Settings + denser panel keyboard | [phases/v2.md](phases/v2.md) · [plan](../superpowers/plans/2026-09-06-wedge-v2-hotkeys.md) |
-| **v3** | Shipped | Settings: pop sound on/off + custom file (≤3s), launch-at-login toggle; **v3.0.2** polish; **v3.0.3** macOS 15 Sequoia+ | [phases/v3.md](phases/v3.md) · [plan](../superpowers/plans/2026-09-06-wedge-v3-settings.md) · [v3.0.2](../superpowers/plans/2026-09-07-wedge-v3.0.2-polish.md) |
+## 1.0
 
-## Explicit non-goals (all phases)
+| Area | Summary |
+|------|---------|
+| Panel | Borderless, non-activating glass panel anchored under the menu-bar item; Now and Up Next in one list; drag a row to the top to make it Now |
+| Done | Ring, pop, rise and menu-bar bump with sound; Undo Done (⌘Z) |
+| Settings | One page: Menu Bar, Done sound, Keyboard, Open at login |
+| Keyboard | Global ⌃⌥W (Show Wedge) and ⌃⌥D (Done), both remappable; full in-panel keys |
+| Shortcuts | App Intents: Add to Up Next, Mark Done, Get Now (Shortcuts and Spotlight) |
+| Storage | Versioned JSON file with atomic writes; recovery from a damaged or unreadable file |
+| Privacy | No network access, no analytics. Verifiable from the sandbox entitlements and privacy manifest |
+| Distribution | Developer ID–signed, notarized download on GitHub Releases. No Mac App Store, no in-app updater |
 
-- iCloud / any cloud sync / accounts
-- Dock icon as a supported product mode
-- Confetti or noisy celebration UI
-- “Add as one thing” mode (adds always go to bottom of Up next)
-- Truncation systems in **v1** (hard 40-char cap instead)
+## History
+
+Earlier phases, kept for reference:
+
+| Phase | Summary | Doc |
+|-------|---------|-----|
+| v1 | Core menu-bar list and panel, Settings, open at login, 40-character cap | [history/v1.md](history/v1.md) · [plan](../superpowers/plans/2026-08-16-wedge-v1.md) |
+| v2 | Global hotkeys with remapping, denser panel keyboard | [history/v2.md](history/v2.md) · [plan](../superpowers/plans/2026-09-06-wedge-v2-hotkeys.md) |
+| v3 | Settings: Done sound on/off and custom file, open at login | [history/v3.md](history/v3.md) · [plan](../superpowers/plans/2026-09-06-wedge-v3-settings.md) |
+
+These documents use the language of their time and are not updated.
+
+## Post-1.0 candidates
+
+_None._
+
+New features follow the process in [overview.md](overview.md#focused-by-default): a deliberate decision, a short design doc of its own, and a fit with the core rules. A candidate is listed here only once that decision has been made.
+
+## Not planned
+
+Sync, iCloud, accounts, Dock mode, confetti, priority fields, tags or multiple lists, an in-app updater, a Mac App Store build, and truncation of long titles (the 40-character cap stays).
 
 ## Change policy
 
-- v1 path may shift slightly during implementation; update [phases/v1.md](phases/v1.md) and `.cursor/rules/` together.
-- Truncation and higher character limits are **not** designed yet — discuss before adding to a phase (likely after v1).
-- Do not invent v4 or sync features.
-
-## Overview
-
-[overview.md](overview.md)
+- Keep this file, [overview.md](overview.md) and `.cursor/rules/wedge-product.mdc` aligned when scope is confirmed or changed.
+- Do not add a feature to this file without the process above.
