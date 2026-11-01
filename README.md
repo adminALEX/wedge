@@ -77,6 +77,10 @@ xcrun swift-format lint -r --strict wedge wedgeTests wedgeUITests
 
 Every push runs the format check and the unit tests on GitHub Actions. UI tests are slower and run only when asked: start the workflow by hand from the Actions tab (workflow_dispatch), or put `[ui-tests]` in the head commit's message.
 
+## Releasing
+
+Releases are built on a Mac with a Developer ID certificate. `scripts/release.sh <version>` (for example `scripts/release.sh 1.0.0`) archives, signs, notarizes, staples and zips the app into `build/release/<version>/` and prints the SHA-256 of the zip. It reads your Apple Developer team ID from `WEDGE_TEAM_ID` and the notarytool keychain profile name from `WEDGE_NOTARY_PROFILE`; no credentials are stored in the repo. Before publishing, work through [docs/release-checklist.md](docs/release-checklist.md) (performance budgets, manual acceptance and hands-on checks).
+
 ## Project
 
 - [Product overview](docs/product/overview.md)
