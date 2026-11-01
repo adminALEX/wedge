@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          XCODE="$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+          sw_vers
+          xcodebuild -list -project wedge.xcodeproj
+
+      - name: Unit tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project wedge.xcodeproj -scheme wedge -destination 'platform=macOS' \
+            -only-testing:wedgeTests \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            2>&1 | tee xcodebuild.log | xcbeautify --renderer github-actions
+
+      - name: Report failures as annotations
+        if: failure()
+        run: |
+          touch xcodebuild.log
+          grep -E "error:|\*\* (BUILD|TEST) FAILED|Expectation failed|Issue recorded|failed \(" xcodebuild.log \
+            | head -45 \
+            | while IFS= read -r line; do echo "::error::${line:0:900}"; done
