@@ -10,9 +10,10 @@ Wedge is free and open source. It requires **macOS 26 Tahoe** or later.
 
 ## Install
 
-1. Download the latest `.zip` from [Releases](https://github.com/adminALEX/wedge/releases) and open it to unzip Wedge.
-2. Move Wedge to Applications and open it. It lives in the menu bar and has no Dock icon.
-3. If the menu-bar item is hidden (a crowded bar, or the notch), open Wedge again from Applications or Spotlight. That opens the panel.
+1. Download the latest `Wedge-<version>.dmg` from [Releases](https://github.com/adminALEX/wedge/releases) and open it.
+2. Drag Wedge onto the Applications folder, then open it from Applications. It lives in the menu bar and has no Dock icon.
+3. The first time, macOS blocks Wedge because it isn't signed with an Apple Developer ID yet. Click **Done**, then go to **System Settings › Privacy & Security**, and next to "Wedge was blocked to protect your Mac" click **Open Anyway**. You only need to do this once.
+4. If the menu-bar item is hidden (a crowded bar, or the notch), open Wedge again from Applications or Spotlight. That opens the panel.
 
 ## Use
 
@@ -79,7 +80,9 @@ Every push runs the format check and the unit tests on GitHub Actions. UI tests 
 
 ## Releasing
 
-Releases are built on a Mac with a Developer ID certificate. `scripts/release.sh <version>` (for example `scripts/release.sh 1.0.0`) archives, signs, notarizes, staples and zips the app into `build/release/<version>/` and prints the SHA-256 of the zip. It reads your Apple Developer team ID from `WEDGE_TEAM_ID` and the notarytool keychain profile name from `WEDGE_NOTARY_PROFILE`; no credentials are stored in the repo. Before publishing, work through [docs/release-checklist.md](docs/release-checklist.md) (performance budgets, manual acceptance and hands-on checks).
+Push a version tag, for example `git tag v1.0.1 && git push origin v1.0.1`. The Release workflow (`.github/workflows/release.yml`) runs the unit tests, builds a universal Release app, packages `Wedge-<version>.dmg` with an Applications shortcut, and publishes it on the Releases page with the notes from `docs/releases/v<version>.md` (or `docs/releases/template.md`). These builds are ad-hoc signed and not notarized, so first launch needs Open Anyway.
+
+Once there is a Developer ID, releases can be signed and notarized on a Mac. `scripts/release.sh <version>` (for example `scripts/release.sh 1.0.0`) archives, signs, notarizes, staples and zips the app into `build/release/<version>/` and prints the SHA-256 of the zip. It reads your Apple Developer team ID from `WEDGE_TEAM_ID` and the notarytool keychain profile name from `WEDGE_NOTARY_PROFILE`; no credentials are stored in the repo. Before publishing, work through [docs/release-checklist.md](docs/release-checklist.md) (performance budgets, manual acceptance and hands-on checks).
 
 ## Project
 

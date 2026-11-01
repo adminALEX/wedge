@@ -1,0 +1,116 @@
+name: Release
+
+# Builds Wedge on a macOS 26 runner, packages a drag-to-install DMG and
+# publishes it as a GitHub Release.
+#
+# Trigger: push a version tag (git tag v1.0.0 && git push origin v1.0.0),
+# or run it by hand from the Actions tab with a version number.
+#
+# The app is ad-hoc signed, not notarized: there is no Developer ID yet.
+# First launch needs System Settings › Privacy & Security › Open Anyway.
+# When a Developer ID exists, add signing + notarization here (see
+# scripts/release.sh for the steps) and drop the Open Anyway notes.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without the leading v, e.g. 1.0.0"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Select Xcode 26
+        run: |
+          XCODE="$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+
+      - name: Resolve version
+        id: v
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then V="$INPUT_VERSION"; else V="${GITHUB_REF_NAME#v}"; fi
+          if ! [[ "$V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version must look like 1.0.0 (got '$V')"; exit 1
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+
+      - name: Unit tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project wedge.xcodeproj -scheme wedge -destination 'platform=macOS' \
+            -only-testing:wedgeTests \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            2>&1 | xcbeautify --renderer github-actions
+
+      - name: Archive (Release, universal, ad-hoc signed)
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project wedge.xcodeproj -scheme wedge -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath build/Wedge.xcarchive \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= \
+            2>&1 | xcbeautify --renderer github-actions
+
+      - name: Build DMG
+        id: dmg
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          set -euo pipefail
+          APP="$(find build/Wedge.xcarchive/Products/Applications -maxdepth 1 -name '*.app' | head -1)"
+          [ -n "$APP" ] || { echo "::error::No .app in the archive"; exit 1; }
+          STAGE="build/dmg"
+          rm -rf "$STAGE" && mkdir -p "$STAGE"
+          ditto "$APP" "$STAGE/Wedge.app"
+          ln -s /Applications "$STAGE/Applications"
+          codesign --verify --deep --strict --verbose=2 "$STAGE/Wedge.app"
+          lipo -archs "$STAGE/Wedge.app/Contents/MacOS/"* | sed 's/^/Architectures: /'
+          DMG="build/Wedge-$VERSION.dmg"
+          # hdiutil occasionally reports "Resource busy" on hosted runners; retry.
+          for attempt in 1 2 3; do
+            if hdiutil create -volname "Wedge" -srcfolder "$STAGE" -fs HFS+ -format UDZO -ov "$DMG"; then break; fi
+            [ "$attempt" = 3 ] && { echo "::error::hdiutil create failed"; exit 1; }
+            sleep 5
+          done
+          hdiutil verify "$DMG"
+          (cd build && shasum -a 256 "Wedge-$VERSION.dmg" | tee "Wedge-$VERSION.dmg.sha256")
+          echo "path=$DMG" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.v.outputs.version }}
+          TAG: ${{ steps.v.outputs.tag }}
+          DMG: ${{ steps.dmg.outputs.path }}
+        run: |
+          set -euo pipefail
+          NOTES="docs/releases/v$VERSION.md"
+          [ -f "$NOTES" ] || NOTES="docs/releases/template.md"
+          SHA="$(cut -d' ' -f1 "build/Wedge-$VERSION.dmg.sha256")"
+          sed -e "s/{{VERSION}}/$VERSION/g" -e "s/{{SHA256}}/$SHA/g" "$NOTES" > build/notes.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$DMG" "build/Wedge-$VERSION.dmg.sha256" --clobber
+          else
+            gh release create "$TAG" "$DMG" "build/Wedge-$VERSION.dmg.sha256" \
+              --target "$GITHUB_SHA" --title "Wedge $VERSION" --notes-file build/notes.md
+          fi
