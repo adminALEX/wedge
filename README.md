@@ -2,7 +2,7 @@
 
 A menu-bar list that shows what you are on now, and keeps the rest in order behind it.
 
-<img src="docs/images/panel.png" alt="The Wedge panel open under its menu-bar item, showing a Now item, one Up Next item and the add field" width="420">
+<img src="docs/images/panel.png" alt="The Wedge panel, showing a Now item, one Up Next item and the add field" width="416">
 
 The menu bar shows **Now**, the top item. Everything below it is **Up Next**, in the order you put it. When the Now item is finished, press Done: the next one rises into place.
 
