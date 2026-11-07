@@ -5,7 +5,10 @@ name: Release
 #
 # Trigger: push a version tag (git tag 1.0.0 && git push origin 1.0.0),
 # without a leading "v": v1.0.0–v3.0.3 are the pre-1.0 internal history tags.
-# or run it by hand from the Actions tab with a version number.
+# or run it by hand from the Actions tab with a version number (rerunning an
+# existing version rebuilds and replaces its files and notes).
+# Every release also attaches Wedge.dmg: the website downloads
+# releases/latest/download/Wedge.dmg, so keep that name.
 #
 # The app is ad-hoc signed, not notarized: there is no Developer ID yet.
 # First launch needs System Settings › Privacy & Security › Open Anyway.
@@ -109,9 +112,13 @@ jobs:
           [ -f "$NOTES" ] || NOTES="docs/releases/template.md"
           SHA="$(cut -d' ' -f1 "build/Wedge-$VERSION.dmg.sha256")"
           sed -e "s/{{VERSION}}/$VERSION/g" -e "s/{{SHA256}}/$SHA/g" "$NOTES" > build/notes.md
+          # Same DMG under a fixed name: the website links releases/latest/download/Wedge.dmg.
+          cp "$DMG" build/Wedge.dmg
+          ASSETS=("$DMG" "build/Wedge-$VERSION.dmg.sha256" build/Wedge.dmg)
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$DMG" "build/Wedge-$VERSION.dmg.sha256" --clobber
+            gh release upload "$TAG" "${ASSETS[@]}" --clobber
+            gh release edit "$TAG" --notes-file build/notes.md  # rebuilt DMG, new checksum
           else
-            gh release create "$TAG" "$DMG" "build/Wedge-$VERSION.dmg.sha256" \
+            gh release create "$TAG" "${ASSETS[@]}" \
               --target "$GITHUB_SHA" --title "Wedge $VERSION" --notes-file build/notes.md
           fi
