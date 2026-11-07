@@ -2,18 +2,24 @@
 
 A menu-bar list that shows what you are on now, and keeps the rest in order behind it.
 
-![The Wedge panel](docs/images/panel.png)
-
 The menu bar shows **Now**, the top item. Everything below it is **Up Next**, in the order you put it. When the Now item is finished, press Done: the next one rises into place.
 
-Wedge is free and open source. It requires **macOS 26 Tahoe** or later.
+Wedge is free and open source (MIT). It requires **macOS 26 Tahoe** or later.
+
+Website: [onnyth.com/wedge](https://onnyth.com/wedge)
 
 ## Install
 
-1. Download the latest `Wedge-<version>.dmg` from [Releases](https://github.com/adminALEX/wedge/releases) and open it.
+1. Download [Wedge.dmg](https://github.com/adminALEX/wedge/releases/latest/download/Wedge.dmg) (always the latest version, also on the [Releases](https://github.com/adminALEX/wedge/releases) page) and open it.
 2. Drag Wedge onto the Applications folder, then open it from Applications. It lives in the menu bar and has no Dock icon.
 3. The first time, macOS blocks Wedge because it isn't signed with an Apple Developer ID yet. Click **Done**, then go to **System Settings › Privacy & Security**, and next to "Wedge was blocked to protect your Mac" click **Open Anyway**. You only need to do this once.
 4. If the menu-bar item is hidden (a crowded bar, or the notch), open Wedge again from Applications or Spotlight. That opens the panel.
+
+## Update
+
+Open Settings (⌘, in the panel) and click **Check for Updates…** in the About section. Wedge shows what's new, downloads the update, checks its signature and relaunches. It never checks on its own.
+
+This button arrived in 1.0.2. On 1.0.0 or 1.0.1, download the latest DMG once and replace the app in Applications. Your list is kept.
 
 ## Use
 
@@ -80,9 +86,21 @@ Every push runs the format check and the unit tests on GitHub Actions. UI tests 
 
 ## Releasing
 
-Push a version tag without a leading "v", for example `git tag 1.0.1 && git push origin 1.0.1` (the `v1.0.0`–`v3.0.3` tags are pre-1.0 internal history). The Release workflow (`.github/workflows/release.yml`) runs the unit tests, builds a universal Release app, packages `Wedge-<version>.dmg` with an Applications shortcut, and publishes it on the Releases page with the notes from `docs/releases/v<version>.md` (or `docs/releases/template.md`). These builds are ad-hoc signed and not notarized, so first launch needs Open Anyway.
+1. Raise `MARKETING_VERSION` to the new version and `CURRENT_PROJECT_VERSION` (the build number) by one. Check for Updates only offers a higher build, and the release workflow fails if the version doesn't match the tag.
+2. Write the notes in `docs/releases/v<version>.md` (otherwise `docs/releases/template.md` is used).
+3. Commit, then push a tag without a leading "v": `git tag 1.0.3 && git push origin 1.0.3`. The `v1.0.0`–`v3.0.3` tags are pre-1.0 internal history.
 
-Once there is a Developer ID, releases can be signed and notarized on a Mac. `scripts/release.sh <version>` (for example `scripts/release.sh 1.0.0`) archives, signs, notarizes, staples and zips the app into `build/release/<version>/` and prints the SHA-256 of the zip. It reads your Apple Developer team ID from `WEDGE_TEAM_ID` and the notarytool keychain profile name from `WEDGE_NOTARY_PROFILE`; no credentials are stored in the repo. Before publishing, work through [docs/release-checklist.md](docs/release-checklist.md) (performance budgets, manual acceptance and hands-on checks).
+The Release workflow (`.github/workflows/release.yml`) runs the unit tests, builds a universal Release app, packages the DMG and publishes the release with these files:
+
+| File | Used by |
+|------|---------|
+| `Wedge-<version>.dmg` and `.sha256` | The Releases page, and the update download |
+| `Wedge.dmg` | The website's download link (`releases/latest/download/Wedge.dmg`) |
+| `appcast.xml` | Check for Updates (`SUFeedURL` in `Config/Info.plist`) |
+
+The appcast is written by `scripts/appcast.sh` and signed with the Sparkle EdDSA key in the `SPARKLE_PRIVATE_KEY` repository secret. Its public half is `SUPublicEDKey` in `Config/Info.plist`. The private key also lives in the maintainer's login keychain (Sparkle account `wedge`); never commit it. To rebuild a release, run the workflow by hand from the Actions tab with the same version: it replaces the files.
+
+Builds are ad-hoc signed and not notarized, so first launch needs Open Anyway. Once there is a Developer ID, `scripts/release.sh <version>` archives, signs, notarizes and staples the app on a Mac, reading the team ID from `WEDGE_TEAM_ID` and the notarytool profile from `WEDGE_NOTARY_PROFILE`. At that point drop `com.apple.security.cs.disable-library-validation` from `Config/Wedge.entitlements`. See [docs/release-checklist.md](docs/release-checklist.md) for the manual checks.
 
 ## Project
 
