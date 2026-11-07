@@ -73,7 +73,7 @@ struct PanelView: View {
         .padding(12)
         .frame(width: PanelAnchor.width)
         .fixedSize(horizontal: false, vertical: true)
-        .glassEffect(.regular, in: .rect(cornerRadius: 20))
+        .glassEffect(.regular, in: .rect(cornerRadius: PanelAnchor.cornerRadius))
         .background { shortcuts }
         .onChange(of: panel.isVisible) { _, isVisible in
             guard isVisible else { return }

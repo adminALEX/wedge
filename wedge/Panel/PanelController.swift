@@ -29,6 +29,12 @@ final class PanelController {
 
     init<Content: View>(content: Content) {
         panel.contentView = hostingView
+        // Clip to the glass shape: anything drawn outside the rounded rect (and the window
+        // shadow computed from it) otherwise shows as a square frame around the panel.
+        hostingView.wantsLayer = true
+        hostingView.layer?.cornerRadius = PanelAnchor.cornerRadius
+        hostingView.layer?.cornerCurve = .continuous
+        hostingView.layer?.masksToBounds = true
         panel.onDismiss = { [weak self] in self?.hide() }
         panel.onCancel = { [weak self] in self?.cancelEdit?() ?? false }
         hostingView.rootView = AnyView(
@@ -94,7 +100,10 @@ final class PanelController {
         }
         let size = CGSize(width: PanelAnchor.width, height: height)
         let frame = PanelAnchor.frame(panelSize: size, itemFrame: item?.frame, visibleFrame: visibleFrame)
-        if panel.frame != frame { panel.setFrame(frame, display: true) }
+        if panel.frame != frame {
+            panel.setFrame(frame, display: true)
+            panel.invalidateShadow()  // recompute from the rounded content, not the old size
+        }
         return true
     }
 

@@ -4,6 +4,8 @@ import CoreGraphics
 /// All frames are in AppKit screen coordinates (origin bottom-left).
 enum PanelAnchor {
     static let width: CGFloat = 320
+    /// Shared by the glass shape and the window clip, so the window has no square corners.
+    static let cornerRadius: CGFloat = 20
     static let gap: CGFloat = 6
     static let margin: CGFloat = 8
 
