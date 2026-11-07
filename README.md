@@ -91,3 +91,7 @@ Once there is a Developer ID, releases can be signed and notarized on a Mac. `sc
 - [Design spec](docs/superpowers/specs/2026-11-01-wedge-1.0-redesign-design.md)
 
 Wedge stays focused by default. Bug fixes and polish are welcome; a new feature needs a short design doc first (see the overview).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
