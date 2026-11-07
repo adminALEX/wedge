@@ -58,6 +58,8 @@ struct SettingsView: View {
             Text(version.map(WedgeCopy.aboutVersion) ?? WedgeCopy.appName)
                 .foregroundStyle(.secondary)
             Spacer()
+            Button(WedgeCopy.checkForUpdates) { environment.updater.checkForUpdates() }
+                .disabled(!environment.updater.canCheckForUpdates)
             if let url = URL(string: WedgeCopy.gitHubAddress) {
                 Link(WedgeCopy.gitHub, destination: url)
             }

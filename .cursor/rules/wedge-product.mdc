@@ -34,7 +34,7 @@ All UI strings come from the String Catalog through `WedgeCopy` (`wedge/Copy/Wed
 - **Errors:** save failure, damaged file (copy kept) and unreadable file each show a banner in the panel. After an unreadable file, saving stays off for the rest of the run so the file is never overwritten.
 - **Settings:** one page. Menu Bar (Bold, Color), Done (Play sound, Sound, ≤ 3 s custom file), Keyboard, Open at login, About.
 - **App Intents:** Add to Up Next, Mark Done, Get Now. Phrases: "Add to Up Next in Wedge", "Mark Done in Wedge", "What's Now in Wedge". Dependencies are registered in `AppDelegate.init`.
-- **Privacy:** no network access, no analytics, no update check. The sandbox has no network entitlement. The privacy manifest declares the UserDefaults and system-boot-time required-reason APIs and no data collection. Do not add a dependency or entitlement that changes this.
+- **Privacy:** no analytics and no background network access. The only network call is the update check (Sparkle), which runs only when the user clicks Check for Updates, and only fetches the appcast and update from GitHub Releases; automatic checks stay off. The sandbox's only network entitlement is outgoing connections, for that check. The privacy manifest declares the UserDefaults and system-boot-time required-reason APIs and no data collection. Do not add a dependency or entitlement that changes this.
 - **Storage:** `Application Support/Wedge/wedge.json` (versioned, atomic writes) inside the app's sandbox container. `UserDefaults` holds preferences only.
 
 ## Focused by default

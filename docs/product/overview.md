@@ -2,7 +2,7 @@
 
 Wedge is a small macOS **menu-bar** app for working through a list one item at a time. The menu bar shows the item you are on. Everything else waits below it, in order. **Requires macOS 26 Tahoe** or later.
 
-Wedge is free, open source and local. It has no accounts, no sync and no network access.
+Wedge is free, open source and local. It has no accounts and no sync. The only time it goes online is when you click Check for Updates.
 
 ## Idea
 

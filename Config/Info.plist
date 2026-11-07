@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Sparkle. Merged with the keys Xcode generates from the INFOPLIST_KEY_ build settings.
+	     Checks run only from Settings › Check for Updates: automatic checks stay off.
+	     WEDGE_FEED_URL is a build setting, so a test build can point at a local server. -->
+	<key>SUFeedURL</key>
+	<string>$(WEDGE_FEED_URL)</string>
+	<key>SUPublicEDKey</key>
+	<string>AeU+00Cqmz4w4BWmRQMSdhozkIVRVF1Cvhap/qiXtp8=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<false/>
+	<key>SUAutomaticallyUpdate</key>
+	<false/>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
+</dict>
+</plist>

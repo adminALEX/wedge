@@ -195,6 +195,9 @@ enum WedgeCopy {
         String(localized: "settings.about.version", defaultValue: "\(appName) \(version)")
     }
     static var gitHub: String { String(localized: "settings.about.gitHub", defaultValue: "GitHub") }
+    static var checkForUpdates: String {
+        String(localized: "settings.about.checkForUpdates", defaultValue: "Check for Updates…")
+    }
     /// A URL, not copy: never translated.
     static let gitHubAddress = "https://github.com/adminALEX/wedge"
 }

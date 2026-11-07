@@ -50,7 +50,7 @@ Wedge adds three actions that appear in the Shortcuts app and in Spotlight witho
 
 ## Privacy
 
-Wedge has no network access, no analytics and no update check. Your list never leaves your Mac. It is stored in Wedge's sandboxed app container, in one file:
+Wedge has no analytics and never goes online by itself. The only connection it makes is when you click **Check for Updates** in Settings: it asks GitHub Releases for the newest version. Your list never leaves your Mac. It is stored in Wedge's sandboxed app container, in one file:
 
 `~/Library/Containers/com.xela.wedge/Data/Library/Application Support/Wedge/wedge.json`
 

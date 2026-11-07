@@ -121,7 +121,7 @@ struct WedgeCopyTests {
             WedgeCopy.soundMessage(for: CustomSoundError.unreadable),
             WedgeCopy.showWedgeShortcut, WedgeCopy.reset,
             WedgeCopy.openAtLogin, WedgeCopy.openLoginItems, WedgeCopy.loginChangeFailed,
-            WedgeCopy.aboutVersion("1.0"), WedgeCopy.gitHub, WedgeCopy.gitHubAddress,
+            WedgeCopy.aboutVersion("1.0"), WedgeCopy.gitHub, WedgeCopy.gitHubAddress, WedgeCopy.checkForUpdates,
         ]
     }
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FA7FFDAE304E03D800EF9F21 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = CA016BE5F6DEC09495513B87 /* KeyboardShortcuts */; };
+		5A0B1E0C2F1D4A6B8C9D0E03 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 5A0B1E0C2F1D4A6B8C9D0E02 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA7FFDAE304E03D800EF9F21 /* KeyboardShortcuts in Frameworks */,
+				5A0B1E0C2F1D4A6B8C9D0E03 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,7 @@
 			name = wedge;
 			packageProductDependencies = (
 				CA016BE5F6DEC09495513B87 /* KeyboardShortcuts */,
+				5A0B1E0C2F1D4A6B8C9D0E02 /* Sparkle */,
 			);
 			productName = wedge;
 			productReference = FA6157763031B5F400315631 /* wedge.app */;
@@ -203,6 +206,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				579D8381C04DF08003977814 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				5A0B1E0C2F1D4A6B8C9D0E01 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA6157773031B5F400315631 /* Products */;
@@ -404,7 +408,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
+				CODE_SIGN_ENTITLEMENTS = Config/Wedge.entitlements;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -412,6 +418,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Wedge;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -427,6 +434,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
+				WEDGE_FEED_URL = "https://github.com/adminALEX/wedge/releases/latest/download/appcast.xml";
 			};
 			name = Debug;
 		};
@@ -438,7 +446,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
+				CODE_SIGN_ENTITLEMENTS = Config/Wedge.entitlements;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -446,6 +456,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Wedge;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -461,6 +472,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
+				WEDGE_FEED_URL = "https://github.com/adminALEX/wedge/releases/latest/download/appcast.xml";
 			};
 			name = Release;
 		};
@@ -590,6 +602,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		5A0B1E0C2F1D4A6B8C9D0E01 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -597,6 +617,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 579D8381C04DF08003977814 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		5A0B1E0C2F1D4A6B8C9D0E02 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A0B1E0C2F1D4A6B8C9D0E01 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

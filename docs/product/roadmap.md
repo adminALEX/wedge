@@ -14,8 +14,8 @@ Wedge 1.0 supersedes the earlier "v1 to v3 only" horizon. The earlier phases rem
 | Keyboard | Global ⌃⌥W (Show Wedge) and ⌃⌥D (Done), both remappable; full in-panel keys |
 | Shortcuts | App Intents: Add to Up Next, Mark Done, Get Now (Shortcuts and Spotlight) |
 | Storage | Versioned JSON file with atomic writes; recovery from a damaged or unreadable file |
-| Privacy | No network access, no analytics. Verifiable from the sandbox entitlements and privacy manifest |
-| Distribution | Developer ID–signed, notarized download on GitHub Releases. No Mac App Store, no in-app updater |
+| Privacy | No analytics, no background network access. The only connection is the on-click update check to GitHub Releases. Verifiable from the sandbox entitlements and privacy manifest |
+| Distribution | Developer ID–signed, notarized download on GitHub Releases. No Mac App Store. Check for Updates in Settings installs new releases (Sparkle, on click only) |
 
 ## History
 

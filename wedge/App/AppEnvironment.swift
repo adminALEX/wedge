@@ -15,8 +15,11 @@ final class AppEnvironment {
     let panel: PanelController
     let statusItem: StatusItemController
     let hotkeys: HotkeyController
+    let updater = Updater()
     private let soundLoader: DoneSoundLoader
     private let showsPanelAtStart: Bool
+    /// Tests never start Sparkle: no update checks from test runs.
+    private let startsUpdater: Bool
 
     init(mode: LaunchMode) {
         let persister: any WedgePersisting
@@ -61,6 +64,7 @@ final class AppEnvironment {
         self.panel = panel
         self.hotkeys = hotkeys
         self.showsPanelAtStart = LaunchMode.showsPanelAtStart(mode)
+        self.startsUpdater = mode == .normal
         self.statusItem = StatusItemController(
             store: store, settings: settings, doneAction: doneAction, panel: panel, hotkeys: hotkeys
         )
@@ -71,6 +75,7 @@ final class AppEnvironment {
         statusItem.start()
         soundLoader.start()
         hotkeys.start()
+        if startsUpdater { updater.start() }
         if showsPanelAtStart { panel.show() }
     }
 }

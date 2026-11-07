@@ -17,4 +17,4 @@ alwaysApply: false
 - A second launch activates the running instance, opens its panel and exits. Reopen (`applicationShouldHandleReopen`) opens the panel too.
 - Login item: `SMAppService.mainApp`; show a failure inline with an Open Login Items button. Hotkeys: KeyboardShortcuts. Sound: preloaded `AVAudioPlayer`.
 - Accessibility: follow light/dark, Reduce Motion, Reduce Transparency and Increase Contrast; use system semantic colours. Every control is reachable with Tab and shows a focus ring. After Done, VoiceOver announces "Done. Now: ‹title›".
-- Logging with `os.Logger` (item text private) and signposts for panel open, Done and save. No network code, analytics or crash-reporting SDKs.
+- Logging with `os.Logger` (item text private) and signposts for panel open, Done and save. No analytics or crash-reporting SDKs. The only network code is Sparkle's on-click update check (`Updater`).

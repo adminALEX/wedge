@@ -19,6 +19,7 @@ Needs your Developer ID certificate and a notarytool keychain profile. Nothing i
 - [ ] `spctl -a -t exec -vv build/release/1.0.0/export/wedge.app` reports `accepted` with source `Notarized Developer ID`.
 - [ ] `xcrun stapler validate build/release/1.0.0/export/wedge.app` succeeds.
 - [ ] Settings > About shows the expected version. The project's `MARKETING_VERSION` is `1.0`; the script does not override it, so the tag `v1.0.0` and the About row differ by design unless you change the build setting.
+- [ ] Raise `MARKETING_VERSION` to the release version and `CURRENT_PROJECT_VERSION` (build number) by one. Check for Updates only offers a build higher than the installed one, and the release workflow fails if `MARKETING_VERSION` doesn't match the tag.
 - [ ] Tag `v1.0.0` on the merged branch and push the tag.
 - [ ] Create the GitHub Release for `v1.0.0` with `Wedge-1.0.0.zip` attached and the SHA-256 in the notes.
 - [ ] Confirm `https://github.com/adminALEX/wedge/releases` is the intended public Releases location (README links to it).
